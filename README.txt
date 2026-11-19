@@ -1,4 +1,4 @@
-NCM Calc Pro 최종 버전 (2026-11-19)
-GitHub Pages: ZIP 압축을 풀어 index.html, sw.js, manifest.webmanifest, icon-192.png, icon-512.png를 저장소 루트에 업로드하세요.
-기존 앱 업데이트 시 GitHub Pages 배포 후 iPhone에서 새로고침하거나 홈 화면 앱을 재실행하세요.
-탭: TS1 / TS2 / OS. 도펀트 기본 목록은 비어 있습니다.
+NCM Calc Pro v7
+GitHub Pages: 압축 해제 후 파일 전체를 저장소 루트에 업로드하세요.
+기록은 각 기기의 localStorage에 저장되며 계정 간 동기화되지 않습니다.
+브라우저 데이터 삭제 또는 앱 제거 시 기록이 사라질 수 있습니다.
