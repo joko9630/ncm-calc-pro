@@ -40,54 +40,47 @@ let nBase=b.m/b.hydroxide,nTotal=nBase/(1-d),nLi=nTotal*b.r,li=nLi*LI_MW;let wei
 function setupWheels(){
  document.querySelectorAll('.wheel').forEach(el=>{
    const id=el.dataset.target, min=Number(el.dataset.min),step=Number(el.dataset.step),max=Number(el.dataset.max),dec=Number(el.dataset.decimals);
-   const target=$(id);let suppress=true;
-   const index=Math.round((Number(target.value)-min)/step);
-   el.scrollTop=index*28;
-   function update(){
-     if(suppress)return;
-     let i=Math.max(0,Math.min(Math.round((max-min)/step),Math.round(el.scrollTop/28)));
+   const target=$(id),maxIndex=Math.round((max-min)/step);
+   let armed=false, armTimer=null, settle=null,programmatic=false;
+   function selectedIndex(){return Math.max(0,Math.min(maxIndex,Math.round((Number(target.value)-min)/step)))}
+   function highlight(i){el.querySelectorAll('.wheel-item').forEach((item,j)=>item.classList.toggle('chosen',j===i))}
+   function position(){
+     programmatic=true;
+     const i=selectedIndex();
+     el.scrollTop=i*28;
+     highlight(i);
+     setTimeout(()=>{programmatic=false},180);
+   }
+   function arm(){armed=true;clearTimeout(armTimer);armTimer=setTimeout(()=>{armed=false},1600)}
+   ['touchstart','pointerdown','wheel','keydown'].forEach(type=>el.addEventListener(type,arm,{passive:true}));
+   el.addEventListener('scroll',()=>{
+     // Programmatic scrolls (including tab activation and hidden panels) must never modify inputs.
+     if(!armed||programmatic||!el.closest('section.active'))return;
+     arm();
+     let i=Math.max(0,Math.min(maxIndex,Math.round(el.scrollTop/28)));
      if(id.endsWith('-Ni')||id.endsWith('-Co')){
-       const k=id.split('-')[0],other=id.endsWith('-Ni')?num(k+'-Co'):num(k+'-Ni');
-       i=Math.min(i,100-other);
+       const k=id.split('-')[0];
+       i=Math.min(i,100-num(id.endsWith('-Ni')?k+'-Co':k+'-Ni'));
      }
      const value=(min+i*step).toFixed(dec);
      if(target.value!==value){
        target.value=value;
        if(id.endsWith('-Ni')||id.endsWith('-Co')){
-         const k=id.split('-')[0];
-         const mn=(100-num(k+'-Ni')-num(k+'-Co')).toFixed(0);
+         const k=id.split('-')[0],mn=100-num(k+'-Ni')-num(k+'-Co');
          $(k+'-Mn').value=mn;$(k+'-Mn-display').textContent=mn;
        }
        calc(id.split('-')[0]);
      }
-     el.querySelectorAll('.wheel-item').forEach((item,j)=>item.classList.toggle('chosen',j===i));
-   }
-   requestAnimationFrame(()=>{if(el.getClientRects().length){el.scrollTop=index*28;suppress=false;update()}});
-   let settle;
-   el.addEventListener('wheel-ready',()=>{suppress=false;update()});
-   el.addEventListener('scroll',()=>{
-     if(suppress || !el.getClientRects().length)return;
-     update();
+     highlight(i);
      clearTimeout(settle);
-     settle=setTimeout(()=>{
-       const i=Math.max(0,Math.min(Math.round((max-min)/step),Math.round(el.scrollTop/28)));
-       let valid=i;
-       if(id.endsWith('-Ni')||id.endsWith('-Co')){
-         const k=id.split('-')[0];
-         valid=Math.min(i,100-num(id.endsWith('-Ni')?k+'-Co':k+'-Ni'));
-       }
-       if(Math.abs(el.scrollTop-valid*28)>0.5)el.scrollTo({top:valid*28,behavior:'smooth'});
-     },110);
+     settle=setTimeout(()=>{armed=false;position()},180);
    },{passive:true});
+   el.addEventListener('wheel-position',()=>{armed=false;clearTimeout(settle);position()});
+   if(el.closest('section.active'))requestAnimationFrame(position);
+   else highlight(selectedIndex());
  });
 }
 function activateWheels(k){
- document.querySelectorAll(`[data-target^="${k}-"].wheel`).forEach(el=>{
-   const target=$(el.dataset.target);
-   const i=Math.round((Number(target.value)-Number(el.dataset.min))/Number(el.dataset.step));
-   el.scrollTop=i*28;
-   el.querySelectorAll('.wheel-item').forEach((item,j)=>item.classList.toggle('chosen',j===i));
-   el.dispatchEvent(new Event('wheel-ready'));
- });
+ document.querySelectorAll(`[data-target^="${k}-"].wheel`).forEach(el=>el.dispatchEvent(new Event('wheel-position')));
 }
 function all(){['li','ts2','os'].forEach(calc)}['ts2','os'].forEach(renderDops);setupWheels();all();document.addEventListener('input',e=>{let t=e.target;if(t.dataset.k&&t.dataset.field){state[t.dataset.k][Number(t.dataset.i)][t.dataset.field]=t.value;calc(t.dataset.k)}else if(t.id&&/^(li|ts2|os)-/.test(t.id))calc(t.id.split('-')[0])});document.addEventListener('change',e=>{let t=e.target;if(t.dataset.k&&t.dataset.field){let d=state[t.dataset.k][Number(t.dataset.i)];d[t.dataset.field]=t.value;if(t.dataset.field==='el'){d.raw=chemicals[d.el][0][0];renderDops(t.dataset.k)}calc(t.dataset.k)}});document.addEventListener('click',async e=>{let t=e.target;if(t.dataset.tab){document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x===t));document.querySelectorAll('section').forEach(x=>x.classList.toggle('active',x.id===t.dataset.tab));const k=t.dataset.tab.replace('-section','');requestAnimationFrame(()=>activateWheels(k))}if(t.dataset.add){state[t.dataset.add].push({el:'Mo',raw:'MoO₃',pct:'0.5'});renderDops(t.dataset.add);calc(t.dataset.add)}if(t.dataset.remove){state[t.dataset.remove].splice(Number(t.dataset.i),1);renderDops(t.dataset.remove);calc(t.dataset.remove)}if(t.dataset.copy){try{await navigator.clipboard.writeText(copies[t.dataset.copy]);t.textContent='복사 완료';setTimeout(()=>t.textContent='계산 결과 복사',1300)}catch(err){alert('복사 권한을 확인해 주세요.')}}});if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));</script></body></html>
