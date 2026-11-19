@@ -1,11 +1,4 @@
-NCM Calc Pro — 23 dopant edition
-
-GitHub Pages deployment:
-1. Upload the CONTENTS of this ZIP (index.html, sw.js, manifest.webmanifest, icons) to the ROOT of your GitHub repository, not the ZIP itself.
-2. Settings > Pages > Deploy from a branch > main > /(root) > Save.
-3. Open your HTTPS GitHub Pages URL in Safari > Share > Add to Home Screen.
-4. If an older app is cached, reload the page while online; you may need to close and reopen the installed app.
-
-Includes 23 dopant elements and selected oxide/hydroxide/commercial fixed hydrate precursors.
-Raw materials are assumed 100% pure. Nominal M-site incorporation and nominal final Li_r M O2 are calculation assumptions, not proof of actual site occupancy or yield.
-TS2 powder is approximated as Li_r M O2 for back-calculation of base metal moles.
+NCM Calc Pro 최종 버전 (2026-11-19)
+GitHub Pages: ZIP 압축을 풀어 index.html, sw.js, manifest.webmanifest, icon-192.png, icon-512.png를 저장소 루트에 업로드하세요.
+기존 앱 업데이트 시 GitHub Pages 배포 후 iPhone에서 새로고침하거나 홈 화면 앱을 재실행하세요.
+탭: TS1 / TS2 / OS. 도펀트 기본 목록은 비어 있습니다.
