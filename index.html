@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-title" content="NCM Calc Pro">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="apple-touch-icon" href="./icon-192.png">
-  <title>NCM Calc Pro v9</title>
+  <title>NCM Calc Pro v2.1</title>
   <style>
     :root {
       --navy: #15283d;
@@ -88,7 +88,7 @@
       border: 0;
       background: transparent;
       padding: 10px 4px;
-      font-size: 14px;
+      font-size: 13.5px;
       font-weight: 700;
       color: #536478;
       border-radius: 9px;
@@ -115,6 +115,45 @@
 
     h2 { font-size: 16px; margin: 0 0 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
     h3 { font-size: 14px; margin: 14px 0 8px; }
+
+    .step-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11.5px;
+      font-weight: 750;
+      color: var(--navy);
+      background: #e7eef7;
+      padding: 4px 9px;
+      border-radius: 999px;
+    }
+
+    .step-divider {
+      border-top: 1px solid #e6edf5;
+      margin: 16px 0 14px;
+      padding-top: 14px;
+    }
+
+    .label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 5px;
+    }
+    .label-row label { margin: 0; }
+    .fill-pill {
+      border: 0;
+      background: var(--accent-soft);
+      color: #1d4ed8;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 999px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .fill-pill:hover { opacity: 0.9; }
 
     .field-header {
       display: flex;
@@ -302,35 +341,24 @@
       padding: 6px;
       font-variant-numeric: tabular-nums;
     }
+    .mass-input.compact {
+      height: 54px;
+      font-size: 22px;
+      text-align: left;
+      padding: 8px 12px;
+    }
     .mass-input::-webkit-inner-spin-button,
     .mass-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 
-    details.advanced {
-      margin-top: 12px;
-      border: 1px solid var(--border);
-      border-radius: 11px;
-      background: #f8fafd;
-      padding: 9px 11px;
-    }
-    details.advanced summary {
-      font-size: 12.5px;
-      font-weight: 700;
-      color: #3e5269;
-      cursor: pointer;
-      list-style: none;
+    .li-src-row {
+      margin-top: 10px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 10px;
     }
-    details.advanced summary::-webkit-details-marker { display: none; }
-    details.advanced summary::after {
-      content: '▾';
-      font-size: 12px;
-      color: var(--muted);
-      transition: transform 0.15s;
-    }
-    details.advanced[open] summary::after { transform: rotate(180deg); }
-    .advanced-body { margin-top: 10px; display: grid; gap: 9px; }
+    .li-src-row label { margin: 0; white-space: nowrap; }
+    .li-src-row select { width: auto; min-width: 145px; padding: 8px 10px; font-size: 13.5px; }
 
     .check-row {
       display: flex;
@@ -356,7 +384,7 @@
       justify-content: space-between;
       flex-wrap: wrap;
       gap: 8px;
-      margin: 14px 0 8px;
+      margin: 12px 0 8px;
     }
     .dop-header h3 { margin: 0; }
 
@@ -391,7 +419,7 @@
       margin: 8px 0;
     }
     .dop input, .dop select { font-size: 13px; padding: 9px 6px; }
-    .dop .remove {
+    .dop .remove, .coat-row .remove {
       border: 0;
       border-radius: 8px;
       background: var(--danger-bg);
@@ -400,6 +428,80 @@
       font-size: 16px;
       font-weight: 700;
       cursor: pointer;
+    }
+
+    /* Coating Row Card */
+    .coat-row {
+      border: 1px solid #e2e9f2;
+      background: #fafcff;
+      border-radius: 12px;
+      padding: 10px;
+      margin: 9px 0;
+    }
+    .coat-top {
+      display: grid;
+      grid-template-columns: minmax(64px, 0.85fr) minmax(105px, 1.4fr) 82px 32px;
+      gap: 6px;
+      align-items: end;
+    }
+    .coat-top input, .coat-top select,
+    .coat-phase-row select, .coat-xyz input {
+      font-size: 13px;
+      padding: 8px 6px;
+    }
+    .coat-phase-row {
+      margin-top: 8px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 6px;
+    }
+    .coat-xyz {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+      margin-top: 6px;
+      background: #eef4fb;
+      padding: 8px;
+      border-radius: 9px;
+    }
+    .coat-xyz label { font-size: 11px; margin-bottom: 3px; text-align: center; }
+    .coat-xyz input { text-align: center; font-weight: 700; }
+
+    .coat-mode-bar {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 5px;
+      background: #e7eef6;
+      padding: 4px;
+      border-radius: 10px;
+      margin-bottom: 11px;
+    }
+    .coat-mode-bar button {
+      border: 0;
+      background: transparent;
+      padding: 8px 6px;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #516276;
+      border-radius: 7px;
+      cursor: pointer;
+    }
+    .coat-mode-bar button.active {
+      background: #fff;
+      color: var(--navy);
+      box-shadow: 0 1px 3px rgba(21, 40, 61, 0.14);
+    }
+
+    .sub-option-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 8px 0 4px;
+      font-size: 12px;
+      color: #46586e;
+      font-weight: 650;
     }
 
     .result {
@@ -433,15 +535,36 @@
       font-variant-numeric: tabular-nums;
       white-space: nowrap;
     }
+    .dose-sub {
+      display: block;
+      font-size: 11.5px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .li-box {
+      background: #f6f9fd;
+      border: 1px solid #dce6f2;
+      border-radius: 11px;
+      padding: 10px 12px;
+      margin: 10px 0;
+    }
+    .li-box-title {
+      font-size: 12px;
+      font-weight: 750;
+      color: var(--navy);
+      margin-bottom: 4px;
+    }
 
     .line {
       display: flex;
       justify-content: space-between;
       gap: 10px;
-      padding: 8px 0;
+      padding: 7.5px 0;
       border-bottom: 1px solid #e9eef4;
       font-size: 13px;
     }
+    .li-box .line:last-child { border-bottom: 0; padding-bottom: 0; }
     .line strong { text-align: right; font-variant-numeric: tabular-nums; }
 
     .btn {
@@ -459,14 +582,13 @@
     }
     .btn:hover { opacity: 0.93; }
     .btn.secondary { background: #e6eef7; color: var(--navy); }
-    .btn.accent { background: var(--accent-soft); color: #1d4ed8; }
     .btn.mini { width: auto; padding: 8px 11px; margin: 0; font-size: 12px; }
 
     .action-row {
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
-      margin-top: 10px;
+      margin-top: 12px;
     }
     .action-row .btn { flex: 1 1 130px; margin-top: 0; }
 
@@ -474,10 +596,10 @@
       background: #f7f9fc;
       border: 1px dashed #cbd6e4;
       border-radius: 12px;
-      padding: 16px;
-      margin-top: 12px;
+      padding: 14px;
+      margin-top: 10px;
       text-align: center;
-      font-size: 13px;
+      font-size: 12.5px;
       color: var(--muted);
     }
 
@@ -498,7 +620,7 @@
       padding: 11px 12px;
       font-size: 13px;
       font-weight: 600;
-      margin-top: 12px;
+      margin-top: 10px;
     }
 
     .history-toolbar {
@@ -510,12 +632,39 @@
     .history-item {
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 12px;
-      margin: 10px 0;
+      margin: 8px 0;
       background: #fcfdff;
+      overflow: hidden;
+    }
+    .history-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 12px 13px;
+      cursor: pointer;
+      list-style: none;
+      user-select: none;
+    }
+    .history-head::-webkit-details-marker { display: none; }
+    .history-head-right {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .history-chevron {
+      font-size: 12px;
+      color: var(--muted);
+      transition: transform 0.16s ease;
+    }
+    .history-item[open] .history-chevron { transform: rotate(180deg); }
+    .history-body {
+      padding: 0 12px 12px;
+      border-top: 1px solid #edf2f7;
     }
     .history-title { font-weight: 750; font-size: 14px; overflow-wrap: anywhere; }
-    .history-meta { font-size: 12px; color: var(--muted); margin: 5px 0 8px; line-height: 1.55; }
+    .history-meta { font-size: 11.5px; color: var(--muted); white-space: nowrap; }
     .history-preview {
       background: #f3f7fc;
       border-radius: 8px;
@@ -525,7 +674,7 @@
       white-space: pre-wrap;
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
       color: #24384e;
-      margin: 0 0 9px;
+      margin: 10px 0 9px;
       overflow-x: auto;
     }
     .history-actions {
@@ -616,8 +765,8 @@
     .modal-confirm.danger { background: var(--danger); color: #fff; }
 
     @media (max-width: 380px) {
-      .dop { grid-template-columns: 60px minmax(78px, 1fr) 68px 28px; gap: 4px; }
-      .dop input, .dop select { font-size: 12px; padding: 8px 4px; }
+      .dop, .coat-top { grid-template-columns: 58px minmax(78px, 1fr) 68px 28px; gap: 4px; }
+      .dop input, .dop select, .coat-top input, .coat-top select { font-size: 12px; padding: 8px 4px; }
       .mass-input { font-size: 24px; }
     }
   </style>
@@ -632,39 +781,45 @@
           <small>Cathode Material Calculator · Offline</small>
         </div>
       </div>
-      <span class="version-badge">v9</span>
+      <span class="version-badge">v2.1</span>
     </header>
 
     <nav role="tablist">
-      <button class="active" data-tab="li" role="tab">TS1</button>
-      <button data-tab="ts2" role="tab">TS2</button>
+      <button class="active" data-tab="ts" role="tab">TS</button>
       <button data-tab="os" role="tab">OS</button>
+      <button data-tab="coat" role="tab">코팅</button>
       <button data-tab="history" role="tab">기록</button>
     </nav>
 
-    <section id="li" class="active">
+    <section id="ts" class="active">
       <div class="card">
-        <h2>TS1 리튬 원료 투입량</h2>
-        <div id="li-input"></div>
-        <div id="li-output"></div>
-      </div>
-    </section>
+        <h2>TS 2단계 소성 계산</h2>
+        <div id="ts-input"></div>
 
-    <section id="ts2">
-      <div class="card">
-        <h2>TS2 도펀트 투입량</h2>
-        <div id="ts2-input"></div>
-        <div class="dop-header">
-          <h3>도펀트 종류 및 함량</h3>
-          <div class="dop-basis" data-basis-group="ts2">
-            <button type="button" class="active" data-basis="sub">mol% 치환</button>
-            <button type="button" data-basis="ext">mol% 외첨</button>
-            <button type="button" data-basis="ppm">ppm (wt)</button>
+        <div id="ts1-output"></div>
+
+        <div class="step-divider">
+          <div class="label-row">
+            <label for="ts-ts2-mass"><span class="step-badge">TS2</span> 가소성품 질량 (g)</label>
+            <button type="button" class="fill-pill" id="btn-apply-ts1-mass" style="display:none"></button>
           </div>
+          <input class="mass-input compact" id="ts-ts2-mass" type="number" min="0" step="any" value="" placeholder="TS1 가소성품 질량 입력" inputmode="decimal">
+
+          <div class="dop-header">
+            <h3>TS2 도펀트 종류 및 함량</h3>
+            <div class="dop-basis" data-basis-group="ts">
+              <button type="button" class="active" data-basis="sub">mol% 치환</button>
+              <button type="button" data-basis="ext">mol% 외첨</button>
+              <button type="button" data-basis="ppm">ppm (wt)</button>
+            </div>
+          </div>
+          <div id="ts-dops"></div>
+          <button type="button" class="btn secondary" data-add="ts">+ 도펀트 추가</button>
+          <label class="check-row" style="margin-top:10px;"><input type="checkbox" id="ts-extra-li"> TS1 Li/Me 유지를 위한 추가 Li 보정 계산</label>
+          <div id="ts2-output"></div>
         </div>
-        <div id="ts2-dops"></div>
-        <button type="button" class="btn secondary" data-add="ts2">+ 도펀트 추가</button>
-        <div id="ts2-output"></div>
+
+        <div id="ts-actions"></div>
       </div>
     </section>
 
@@ -686,6 +841,49 @@
       </div>
     </section>
 
+    <section id="coat">
+      <div class="card">
+        <h2>코팅 소성 계산</h2>
+
+        <div class="coat-mode-bar" id="coat-mode-bar">
+          <button type="button" class="active" data-coat-mode="ppm">원소 ppm 기준</button>
+          <button type="button" data-coat-mode="phase">Li<sub>x</sub>M<sub>y</sub>O<sub>z</sub> 상 wt% 기준</button>
+        </div>
+
+        <label for="coat-mass">양극재 질량 (g)</label>
+        <input class="mass-input compact" id="coat-mass" type="number" min="0" step="any" value="" placeholder="코팅할 양극재 질량 입력" inputmode="decimal">
+
+        <div class="sub-option-row" id="coat-denom-row">
+          <span>wt% 분모 기준</span>
+          <div class="dop-basis" id="coat-denom-group">
+            <button type="button" class="active" data-coat-denom="ext">양극재 대비 (외첨)</button>
+            <button type="button" data-coat-denom="total">최종 총질량 기준</button>
+          </div>
+        </div>
+
+        <div class="sub-option-row" id="coat-li-mode-row">
+          <span>코팅상 Li 공급</span>
+          <div class="dop-basis" id="coat-li-mode-group">
+            <button type="button" class="active" data-coat-li-mode="add">Li 추가 외첨</button>
+            <button type="button" data-coat-li-mode="residual">표면 잔류 Li 활용</button>
+          </div>
+        </div>
+
+        <div id="coat-li-src-wrap" class="li-src-row">
+          <label for="coat-li-src">추가 외첨 Li 원료</label>
+          <select id="coat-li-src"></select>
+        </div>
+
+        <div class="dop-header">
+          <h3>코팅 원료 및 형성 상</h3>
+        </div>
+        <div id="coat-rows"></div>
+        <button type="button" class="btn secondary" id="btn-add-coat">+ 코팅 원료 추가</button>
+
+        <div id="coat-output"></div>
+      </div>
+    </section>
+
     <section id="history">
       <div class="card">
         <h2>저장된 실험 기록</h2>
@@ -703,7 +901,7 @@
     </section>
 
     <div class="foot">
-      23종 도펀트 · 대표 산화물/수산화물/상용 수화물 및 Li 원료 3종 지원. SrO·BaO는 흡습/탄산화에 주의하세요. 기본 가정: 순수 NiₓCoᵧMnᵤ(OH)₂ 기준, 소성 후 질량은 명목상 LiᵣMO₂ 이론값이며 산소 비화학양론과 잔류 리튬은 반영하지 않습니다.
+      26종 도펀트·코팅 원소 및 Li 원료 3종 지원. SrO·BaO는 흡습/탄산화에 주의하세요. 원료 순도 100%, 소성 손실·비화학양론 미반영 이론값 기준입니다.
     </div>
   </main>
 
@@ -724,6 +922,7 @@
   <script>
     const aw = {
       Ni: 58.6934, Co: 58.9332, Mn: 54.938044, Li: 6.94, O: 15.999, H: 1.008, C: 12.011,
+      N: 14.007, P: 30.973761998, S: 32.06, Si: 28.085,
       Ti: 47.867, Zr: 91.224, Nb: 92.90637, Mo: 95.95, W: 183.84, Al: 26.9815385, B: 10.81,
       Ta: 180.94788, Y: 88.90584, La: 138.90547, Ce: 140.116, Sr: 87.62, Ba: 137.327,
       Sn: 118.71, Ga: 69.723, Na: 22.98976928, Mg: 24.305, Cr: 51.9961, Sb: 121.76,
@@ -764,18 +963,124 @@
       Cu: [['CuO', { Cu: 1, O: 1 }], ['Cu(OH)₂', { Cu: 1, O: 2, H: 2 }]]
     };
 
+    /* Coating-specific extended raw materials (includes Co, P, Si, nitrates/hydrates) */
+    const COAT_CHEMICALS = {
+      ...chemicals,
+      B: [['H₃BO₃ (붕산)', { B: 1, H: 3, O: 3 }], ['B₂O₃', { B: 2, O: 3 }]],
+      Co: [
+        ['Co(OH)₂', { Co: 1, O: 2, H: 2 }],
+        ['Co₃O₄', { Co: 3, O: 4 }],
+        ['CoSO₄·7H₂O', { Co: 1, S: 1, O: 11, H: 14 }],
+        ['Co(NO₃)₂·6H₂O', { Co: 1, N: 2, O: 12, H: 12 }]
+      ],
+      Al: [
+        ['Al₂O₃', { Al: 2, O: 3 }],
+        ['Al(OH)₃', { Al: 1, O: 3, H: 3 }],
+        ['Al(NO₃)₃·9H₂O', { Al: 1, N: 3, O: 18, H: 18 }]
+      ],
+      Zr: [
+        ['ZrO₂', { Zr: 1, O: 2 }],
+        ['Zr(OH)₄', { Zr: 1, O: 4, H: 4 }],
+        ['ZrO(NO₃)₂·2H₂O', { Zr: 1, N: 2, O: 9, H: 4 }]
+      ],
+      Ti: [['TiO₂', { Ti: 1, O: 2 }], ['Ti(OH)₄', { Ti: 1, O: 4, H: 4 }]],
+      W: [['WO₃', { W: 1, O: 3 }], ['H₂WO₄', { H: 2, W: 1, O: 4 }]],
+      Nb: [['Nb₂O₅', { Nb: 2, O: 5 }], ['Nb(OH)₅', { Nb: 1, O: 5, H: 5 }]],
+      P: [
+        ['NH₄H₂PO₄ (MAP)', { N: 1, H: 6, P: 1, O: 4 }],
+        ['(NH₄)₂HPO₄ (DAP)', { N: 2, H: 9, P: 1, O: 4 }],
+        ['Li₃PO₄', { Li: 3, P: 1, O: 4 }]
+      ],
+      Mo: [['MoO₃', { Mo: 1, O: 3 }], ['(NH₄)₆Mo₇O₂₄·4H₂O', { N: 6, H: 32, Mo: 7, O: 28 }]],
+      Si: [['SiO₂', { Si: 1, O: 2 }], ['TEOS (C₈H₂₀O₄Si)', { C: 8, H: 20, O: 4, Si: 1 }]]
+    };
+
+    /* Representative LixMyOz coating phases per element */
+    const COAT_PHASES = {
+      B: [
+        { label: 'Li₃BO₃', x: 3, y: 1, z: 3 },
+        { label: 'LiBO₂', x: 1, y: 1, z: 2 },
+        { label: 'Li₂B₄O₇', x: 2, y: 4, z: 7 },
+        { label: 'B₂O₃ (비리튬)', x: 0, y: 2, z: 3 }
+      ],
+      Al: [
+        { label: 'LiAlO₂', x: 1, y: 1, z: 2 },
+        { label: 'Al₂O₃ (비리튬)', x: 0, y: 2, z: 3 }
+      ],
+      Co: [
+        { label: 'LiCoO₂', x: 1, y: 1, z: 2 },
+        { label: 'Co₃O₄ (비리튬)', x: 0, y: 3, z: 4 }
+      ],
+      Zr: [
+        { label: 'Li₂ZrO₃', x: 2, y: 1, z: 3 },
+        { label: 'ZrO₂ (비리튬)', x: 0, y: 1, z: 2 }
+      ],
+      Ti: [
+        { label: 'Li₂TiO₃', x: 2, y: 1, z: 3 },
+        { label: 'Li₄Ti₅O₁₂', x: 4, y: 5, z: 12 },
+        { label: 'TiO₂ (비리튬)', x: 0, y: 1, z: 2 }
+      ],
+      W: [
+        { label: 'Li₂WO₄', x: 2, y: 1, z: 4 },
+        { label: 'Li₄WO₅', x: 4, y: 1, z: 5 },
+        { label: 'Li₆W₂O₉', x: 6, y: 2, z: 9 },
+        { label: 'WO₃ (비리튬)', x: 0, y: 1, z: 3 }
+      ],
+      Nb: [
+        { label: 'LiNbO₃', x: 1, y: 1, z: 3 },
+        { label: 'Li₃NbO₄', x: 3, y: 1, z: 4 },
+        { label: 'Nb₂O₅ (비리튬)', x: 0, y: 2, z: 5 }
+      ],
+      P: [
+        { label: 'Li₃PO₄', x: 3, y: 1, z: 4 },
+        { label: 'LiPO₃', x: 1, y: 1, z: 3 }
+      ],
+      Mo: [
+        { label: 'Li₂MoO₄', x: 2, y: 1, z: 4 },
+        { label: 'MoO₃ (비리튬)', x: 0, y: 1, z: 3 }
+      ],
+      Si: [
+        { label: 'Li₂SiO₃', x: 2, y: 1, z: 3 },
+        { label: 'Li₄SiO₄', x: 4, y: 1, z: 4 },
+        { label: 'SiO₂ (비리튬)', x: 0, y: 1, z: 2 }
+      ],
+      Ta: [
+        { label: 'LiTaO₃', x: 1, y: 1, z: 3 },
+        { label: 'Ta₂O₅ (비리튬)', x: 0, y: 2, z: 5 }
+      ],
+      V: [
+        { label: 'Li₃VO₄', x: 3, y: 1, z: 4 },
+        { label: 'LiVO₃', x: 1, y: 1, z: 3 },
+        { label: 'V₂O₅ (비리튬)', x: 0, y: 2, z: 5 }
+      ],
+      La: [
+        { label: 'La₂O₃ (비리튬)', x: 0, y: 2, z: 3 },
+        { label: 'LiLaO₂', x: 1, y: 1, z: 2 }
+      ],
+      Y: [
+        { label: 'LiYO₂', x: 1, y: 1, z: 2 },
+        { label: 'Y₂O₃ (비리튬)', x: 0, y: 2, z: 3 }
+      ],
+      Ce: [{ label: 'CeO₂ (비리튬)', x: 0, y: 1, z: 2 }],
+      Mg: [{ label: 'MgO (비리튬)', x: 0, y: 1, z: 1 }]
+    };
+
     const PRESETS = [
       { label: '83:12:5', ni: 83, co: 12 },
-      { label: '811', ni: 80, co: 10 },
-      { label: '88:9:3', ni: 88, co: 9 },
-      { label: '90:5:5', ni: 90, co: 5 },
-      { label: '622', ni: 60, co: 20 },
-      { label: '523', ni: 50, co: 20 }
+      { label: '88:5:7', ni: 88, co: 5 },
+      { label: '92:7:1', ni: 92, co: 7 },
+      { label: '75:25', ni: 75, co: 0 },
+      { label: '80:20', ni: 80, co: 0 }
     ];
 
     const dopantOrder = [
       'Mo', 'Nb', 'Ti', 'Mg', 'W', 'Zr', 'Al', 'B', 'V', 'Ta',
       ...Object.keys(chemicals).filter(x => !['Mo', 'Nb', 'Ti', 'Mg', 'W', 'Zr', 'Al', 'B', 'V', 'Ta'].includes(x))
+    ];
+
+    const coatElementOrder = [
+      'B', 'Al', 'Co', 'Zr', 'Ti', 'W', 'Nb', 'P', 'Mo', 'Si', 'Ta', 'Mg', 'La', 'Y', 'Ce', 'V',
+      ...Object.keys(COAT_CHEMICALS).filter(x => !['B', 'Al', 'Co', 'Zr', 'Ti', 'W', 'Nb', 'P', 'Mo', 'Si', 'Ta', 'Mg', 'La', 'Y', 'Ce', 'V'].includes(x))
     ];
 
     const $ = (id) => document.getElementById(id);
@@ -784,16 +1089,31 @@
     const finite = (...v) => v.every(x => Number.isFinite(x));
     const roundClean = (x, dec = 2) => Number(Number(x).toFixed(dec));
 
-    const state = {
-      ts2: [],
-      os: [],
-      inputMode: { li: 'wheel', ts2: 'wheel', os: 'wheel' },
-      dopBasis: { ts2: 'sub', os: 'sub' }
-    };
-    const copies = {};
-    const lastComputed = {};
+    const emptyCoatRow = () => ({ el: '', raw: '', val: '', phaseIdx: '0', x: 1, y: 1, z: 2 });
+    const createCoatState = () => ({
+      mass: '',
+      denom: 'ext',
+      liMode: 'add',
+      liSrc: 'LiOH·H₂O',
+      rows: [emptyCoatRow()]
+    });
 
-    /* Toast & Modal helpers (sandbox & PWA safe) */
+    const state = {
+      ts: [],
+      os: [],
+      inputMode: { ts: 'wheel', os: 'wheel' },
+      dopBasis: { ts: 'sub', os: 'sub' },
+      coatMode: 'ppm',
+      coatData: {
+        ppm: createCoatState(),
+        phase: createCoatState()
+      }
+    };
+    const curCoat = () => state.coatData[state.coatMode];
+    const copies = { ts: '', os: '', coat: '' };
+    let lastTs1Calcined = null;
+
+    /* Toast & Modal helpers */
     let toastTimer = null;
     function showToast(msg) {
       const el = $('toast');
@@ -860,6 +1180,10 @@
       return ok;
     }
 
+    function escapeHtml(x) {
+      return String(x ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+
     /* Wheel & Base Inputs */
     function wheelHtml(id, min, max, step, initial, decimals = 0) {
       const count = Math.round((max - min) / step);
@@ -886,32 +1210,6 @@
         `<button type="button" class="preset-chip" data-preset-k="${k}" data-ni="${p.ni}" data-co="${p.co}">${p.label}</button>`
       ).join('');
 
-      const advancedFields = k === 'ts2'
-        ? `
-          <div class="grid2">
-            <div><label>도펀트 원료 순도 (%)</label><input id="${k}-dop-purity" type="number" min="1" max="100" step="any" value="100" inputmode="decimal"></div>
-            <div><label>보정용 Li 원료</label><select id="${k}-li-src">${liOptions}</select></div>
-          </div>
-          <div class="grid2">
-            <div><label>Li 원료 순도 (%)</label><input id="${k}-li-purity" type="number" min="1" max="100" step="any" value="100" inputmode="decimal"></div>
-            <div><label>Li 손실 보정 (%)</label><input id="${k}-li-loss" type="number" min="0" max="30" step="any" value="0" inputmode="decimal"></div>
-          </div>
-          <label class="check-row"><input type="checkbox" id="${k}-extra-li"> TS1 Li/Me 유지를 위한 추가 Li 보정량 계산</label>
-        `
-        : `
-          <div class="grid2">
-            <div><label>Li 원료 선택</label><select id="${k}-li-src">${liOptions}</select></div>
-            <div><label>Li 원료 순도 (%)</label><input id="${k}-li-purity" type="number" min="1" max="100" step="any" value="100" inputmode="decimal"></div>
-          </div>
-          <div class="grid2">
-            <div><label>Li 손실 보정 (+%)</label><input id="${k}-li-loss" type="number" min="0" max="30" step="any" value="0" inputmode="decimal"></div>
-            ${k === 'os'
-              ? `<div><label>도펀트 원료 순도 (%)</label><input id="${k}-dop-purity" type="number" min="1" max="100" step="any" value="100" inputmode="decimal"></div>`
-              : `<div><label>전구체 순도 (%)</label><input id="${k}-pre-purity" type="number" min="1" max="100" step="any" value="100" inputmode="decimal"></div>`
-            }
-          </div>
-        `;
-
       return `
         <div id="${k}-picker-scope">
           <div class="field-header">
@@ -929,30 +1227,31 @@
           </div>
           <div class="grid2 mass-row">
             <div>
-              <label>${k === 'ts2' ? 'TS1 가소성품 질량 (g)' : '전구체 질량 (g)'}</label>
+              <label>${k === 'ts' ? '<span class="step-badge" style="margin-right:4px;">TS1</span> 전구체 질량 (g)' : '전구체 질량 (g)'}</label>
               <input class="mass-input" id="${k}-mass" type="number" min="0" step="any" value="" placeholder="질량 입력" inputmode="decimal">
             </div>
             <div>
-              <label>${k === 'os' ? '최종 목표 Li/Me' : 'Li/Me ratio' + (k === 'ts2' ? ' (TS1)' : '')}</label>
+              <label>${k === 'os' ? '최종 목표 Li/Me' : 'Li/Me ratio (TS1)'}</label>
               ${wheelHtml(k + '-ratio', 0.90, 1.30, 0.01, 1.05, 2)}
             </div>
           </div>
+          <div class="li-src-row">
+            <label for="${k}-li-src">Li 원료</label>
+            <select id="${k}-li-src">${liOptions}</select>
+          </div>
         </div>
-        <details class="advanced">
-          <summary>원료 종류 · 순도 · 손실 보정 (선택)</summary>
-          <div class="advanced-body">${advancedFields}</div>
-        </details>
       `;
     }
 
-    ['li', 'ts2', 'os'].forEach(k => { $(k + '-input').innerHTML = baseInputs(k); });
+    ['ts', 'os'].forEach(k => { $(k + '-input').innerHTML = baseInputs(k); });
+    $('coat-li-src').innerHTML = Object.keys(LI_SOURCES).map(name => `<option value="${name}">${name}</option>`).join('');
 
     function updateMn(k) {
       const ni = Number($(k + '-Ni').value);
       const co = Number($(k + '-Co').value);
       const mn = roundClean(100 - ni - co, 3);
       $(k + '-Mn').value = mn;
-      $(k + '-Mn-display').textContent = Number.isInteger(mn) ? String(mn) : String(mn);
+      $(k + '-Mn-display').textContent = String(mn);
       updatePresetHighlight(k);
     }
 
@@ -981,7 +1280,6 @@
       if (mode === 'direct') {
         syncDirectInputs(k);
       } else {
-        // Clamp to wheel step cleanly when returning to wheel mode
         const ni = Math.max(0, Math.min(100, Math.round(num(k + '-Ni') || 0)));
         const co = Math.max(0, Math.min(100 - ni, Math.round(num(k + '-Co') || 0)));
         const r = Math.max(0.90, Math.min(1.30, roundClean(num(k + '-ratio') || 1.05, 2)));
@@ -995,34 +1293,23 @@
       }
     }
 
-    function getBase(k) {
-      const rawMass = $(k + '-mass').value.trim();
-      if (rawMass === '') return { empty: true };
+    function getCommonParams(k) {
       const v = ['Ni', 'Co', 'Mn'].map(e => num(k + '-' + e));
       const s = v.reduce((a, b) => a + b, 0);
-      const m = Number(rawMass);
       const r = num(k + '-ratio');
       const liSrcName = $(k + '-li-src').value;
       const liSource = LI_SOURCES[liSrcName];
-      const liPurity = num(k + '-li-purity');
-      const liLoss = num(k + '-li-loss');
-      const dopPurity = $(k + '-dop-purity') ? num(k + '-dop-purity') : 100;
-      const prePurity = $(k + '-pre-purity') ? num(k + '-pre-purity') : 100;
 
-      if (!finite(...v, m, r, liPurity, liLoss, dopPurity, prePurity) ||
-          v.some(x => x < 0) || s <= 0 || m <= 0 || r <= 0 ||
-          liPurity <= 0 || liPurity > 100 || dopPurity <= 0 || dopPurity > 100 ||
-          prePurity <= 0 || prePurity > 100 || liLoss < 0 || !liSource) {
+      if (!finite(...v, r) || v.some(x => x < 0) || s <= 0 || r <= 0 || !liSource) {
         return null;
       }
 
       const mm = (v[0] * aw.Ni + v[1] * aw.Co + v[2] * aw.Mn) / s;
       return {
-        m, r, mm,
+        r, mm,
         hydroxide: mm + MW({ O: 2, H: 2 }),
         liSrcName, liSource, liMW: MW(liSource.formula),
-        liPurity, liLoss, dopPurity, prePurity,
-        extraLi: k === 'ts2' ? Boolean($(k + '-extra-li')?.checked) : false
+        extraLi: k === 'ts' ? Boolean($('ts-extra-li')?.checked) : false
       };
     }
 
@@ -1064,9 +1351,7 @@
       const validRows = [];
 
       for (const d of state[k]) {
-        const isCompletelyEmpty = !d.el && !d.raw && String(d.pct).trim() === '';
-        const isPartial = !d.el || !d.raw || String(d.pct).trim() === '';
-        if (isCompletelyEmpty || isPartial) {
+        if (!d.el || !d.raw || String(d.pct).trim() === '') {
           incompleteCount++;
           continue;
         }
@@ -1107,182 +1392,209 @@
       `).join('');
     }
 
-    function renderOutput(k, { heading, prominent, items, copy, note = '', warn = '', extraActions = '' }) {
-      $(k + '-output').innerHTML = `
-        <div class="result">
-          <div class="hint" style="margin:0 0 6px;">${heading}</div>
-          ${prominent}
-        </div>
-        ${linesHtml(items)}
-        ${warn ? `<div class="warn-inline">${warn}</div>` : ''}
-        ${note ? `<p class="hint">${note}</p>` : ''}
-        <div class="action-row">
-          <button type="button" class="btn" data-copy="${k}">계산 결과 복사</button>
-          <button type="button" class="btn secondary" data-save="${k}">기록 저장</button>
-          ${extraActions}
-        </div>
-      `;
-      copies[k] = copy;
-    }
-
-    function showEmpty(k) {
-      $(k + '-output').innerHTML = `<div class="empty-state">${k === 'ts2' ? 'TS1 가소성품 질량(g)' : '전구체 질량(g)'}을 입력하면 투입량이 자동으로 계산됩니다.</div>`;
-      copies[k] = '';
-    }
-
-    function showInvalid(k, msg = '입력값을 확인해 주세요. (음수 불가, 치환 도펀트 총량 100 mol% 미만)') {
-      $(k + '-output').innerHTML = `<div class="error">${msg}</div>`;
-      copies[k] = '';
-    }
-
     function calcLiRawMass(nLi, b) {
-      return (nLi * (1 + b.liLoss / 100) / b.liSource.liAtoms) * b.liMW / (b.liPurity / 100);
+      return (nLi / b.liSource.liAtoms) * b.liMW;
     }
 
-    function calc(k) {
-      const b = getBase(k);
-      if (b && b.empty) return showEmpty(k);
-      if (!b) return showInvalid(k, '전이금속 조성(합계 100, 음수 불가), 질량, Li/Me 및 순도 값을 확인해 주세요.');
+    /* ================= TS & OS Calculations ================= */
+    function calcTs() {
+      const b = getCommonParams('ts');
+      const applyBtn = $('btn-apply-ts1-mass');
+      lastTs1Calcined = null;
+      applyBtn.style.display = 'none';
 
-      const ratio = ['Ni', 'Co', 'Mn'].map(x => $(k + '-' + x).value).join(':');
-      const today = new Date().toLocaleDateString('ko-KR');
-      const corrNote = (b.liPurity !== 100 || b.liLoss !== 0 || b.dopPurity !== 100 || b.prePurity !== 100)
-        ? `보정 적용: Li 순도 ${b.liPurity}%, Li 손실 +${b.liLoss}%${k === 'li' ? `, 전구체 순도 ${b.prePurity}%` : `, 도펀트 순도 ${b.dopPurity}%`}. `
-        : '';
-
-      if (k === 'li') {
-        const effectivePreMass = b.m * (b.prePurity / 100);
-        const mol = effectivePreMass / b.hydroxide;
-        const nLi = mol * b.r;
-        const liMass = calcLiRawMass(nLi, b);
-        const calcined = mol * (b.mm + b.r * aw.Li + 2 * aw.O);
-        const totalMix = b.m + liMass;
-
-        lastComputed.li = {
-          ni: $(k + '-Ni').value,
-          co: $(k + '-Co').value,
-          mn: $(k + '-Mn').value,
-          ratio: $(k + '-ratio').value,
-          calcined: roundClean(calcined, 2),
-          liSrcName: b.liSrcName
-        };
-
-        const copy = [
-          `${today}`,
-          `TS1 | NCM ${ratio} / Li/Me ${b.r} / 전구체 ${b.m} g`,
-          `${b.liSrcName}: ${fmt(liMass, 4)} g`,
-          `총 혼합 질량: ${fmt(totalMix, 2)} g`,
-          `예상 소성 후 질량: ${fmt(calcined, 2)} g`
-        ].join('\n');
-
-        return renderOutput(k, {
-          heading: `${b.liSrcName} 필요량`,
-          prominent: `<div class="big">${fmt(liMass, 4)} g</div>`,
-          items: [
-            ['전구체 분자량', `${fmt(b.hydroxide, 3)} g/mol`],
-            ['총 혼합 질량', `${fmt(totalMix, 2)} g`],
-            ['예상 소성 후 질량', `${fmt(calcined, 2)} g`]
-          ],
-          copy,
-          note: `${corrNote}소성 후 질량은 명목상 LiᵣMO₂ 기준 이론값입니다.`,
-          extraActions: `<button type="button" class="btn accent" data-send-ts2="1">TS2로 보내기 →</button>`
-        });
+      if (!b) {
+        $('ts1-output').innerHTML = '<div class="error">전이금속 조성(합계 100, 음수 불가), Li/Me 및 순도 값을 확인해 주세요.</div>';
+        $('ts2-output').innerHTML = '';
+        $('ts-actions').innerHTML = '';
+        copies.ts = '';
+        return;
       }
 
-      const dop = getDops(k);
-      if (!dop) return showInvalid(k);
+      const ratio = ['Ni', 'Co', 'Mn'].map(x => $('ts-' + x).value).join(':');
+      const today = new Date().toLocaleDateString('ko-KR');
+      const copyBlocks = [];
+
+      const rawTs1 = $('ts-mass').value.trim();
+      if (rawTs1 === '') {
+        $('ts1-output').innerHTML = '<div class="empty-state">TS1 전구체 질량(g)을 입력하면 리튬 원료 투입량이 계산됩니다.</div>';
+      } else {
+        const m1 = Number(rawTs1);
+        if (!Number.isFinite(m1) || m1 <= 0) {
+          $('ts1-output').innerHTML = '<div class="error">TS1 전구체 질량은 0보다 큰 숫자로 입력해 주세요.</div>';
+        } else {
+          const mol = m1 / b.hydroxide;
+          const nLi = mol * b.r;
+          const liMass = calcLiRawMass(nLi, b);
+          const calcined = mol * (b.mm + b.r * aw.Li + 2 * aw.O);
+          const totalMix = m1 + liMass;
+
+          lastTs1Calcined = roundClean(calcined, 2);
+          applyBtn.textContent = `TS1 예상값(${fmt(lastTs1Calcined, 2)} g) 적용`;
+          applyBtn.style.display = 'inline-block';
+
+          $('ts1-output').innerHTML = `
+            <div class="result">
+              <div class="hint" style="margin:0 0 6px;">TS1 ${b.liSrcName} 필요량</div>
+              <div class="big">${fmt(liMass, 4)} g</div>
+            </div>
+            ${linesHtml([
+              ['전구체 분자량', `${fmt(b.hydroxide, 3)} g/mol`],
+              ['TS1 총 혼합 질량', `${fmt(totalMix, 2)} g`],
+              ['예상 1차 소성 후 질량', `${fmt(calcined, 2)} g`]
+            ])}
+            <p class="hint">소성 후 질량은 명목상 LiᵣMO₂ 기준 이론값입니다.</p>
+          `;
+
+          copyBlocks.push([
+            `TS1 | NCM ${ratio} / Li/Me ${b.r} / 전구체 ${m1} g`,
+            `${b.liSrcName}: ${fmt(liMass, 4)} g`,
+            `총 혼합 질량: ${fmt(totalMix, 2)} g / 예상 소성 질량: ${fmt(calcined, 2)} g`
+          ].join('\n'));
+        }
+      }
+
+      const rawTs2 = $('ts-ts2-mass').value.trim();
+      if (rawTs2 === '') {
+        $('ts2-output').innerHTML = '<div class="empty-state">TS1 가소성품 질량(g)을 입력하면 TS2 도펀트 투입량이 계산됩니다.</div>';
+      } else {
+        const m2 = Number(rawTs2);
+        const dop = getDops('ts');
+        if (!Number.isFinite(m2) || m2 <= 0) {
+          $('ts2-output').innerHTML = '<div class="error">TS1 가소성품 질량은 0보다 큰 숫자로 입력해 주세요.</div>';
+        } else if (!dop) {
+          $('ts2-output').innerHTML = '<div class="error">도펀트 입력값을 확인해 주세요. (음수 불가, 치환 총량 100 mol% 미만)</div>';
+        } else {
+          const { rows, incompleteCount, basis } = dop;
+          const warn = incompleteCount > 0 ? `미입력 도펀트 행 ${incompleteCount}개가 있어 완료된 항목만 계산했습니다.` : '';
+          const unit = basisUnitLabel(basis);
+          const pctDec = basis === 'ppm' ? 0 : 3;
+
+          const ts1Unit = b.mm + b.r * aw.Li + 2 * aw.O;
+          const nBase = m2 / ts1Unit;
+          const nLiTs1 = nBase * b.r;
+          let nTotal = nBase;
+          let weights = [];
+
+          if (basis === 'sub') {
+            nTotal = nBase / (1 - dop.d);
+            weights = rows.map(x => {
+              const nDop = nTotal * (x.pct / 100);
+              const g = (nDop / x.atoms) * x.mw;
+              return { ...x, nDop, g };
+            });
+          } else if (basis === 'ext') {
+            weights = rows.map(x => {
+              const nDop = nBase * (x.pct / 100);
+              const g = (nDop / x.atoms) * x.mw;
+              return { ...x, nDop, g };
+            });
+            nTotal = nBase + weights.reduce((s, x) => s + x.nDop, 0);
+          } else {
+            weights = rows.map(x => {
+              const mEl = m2 * (x.pct / 1e6);
+              const nDop = mEl / aw[x.el];
+              const g = (nDop / x.atoms) * x.mw;
+              return { ...x, nDop, g };
+            });
+            nTotal = nBase + weights.reduce((s, x) => s + x.nDop, 0);
+          }
+
+          const totalDopMol = weights.reduce((s, x) => s + x.nDop, 0);
+          const dopMolPct = nTotal > 0 ? (totalDopMol / nTotal) * 100 : 0;
+          const dopRawTotal = weights.reduce((s, x) => s + x.g, 0);
+          const liFinal = nLiTs1 / nTotal;
+          const nLiExtra = Math.max(0, b.r * nTotal - nLiTs1);
+          const extraLiMass = b.extraLi ? calcLiRawMass(nLiExtra, b) : 0;
+          const totalMix2 = m2 + dopRawTotal + extraLiMass;
+
+          const prominent = (b.extraLi && extraLiMass > 0
+            ? `<div class="highlight-dose"><span>추가 ${b.liSrcName} <small>(Li/Me ${b.r} 유지)</small></span><strong>${fmt(extraLiMass, 4)} g</strong></div>`
+            : '') + highlightDopants(weights, basis);
+
+          $('ts2-output').innerHTML = `
+            <div class="result">
+              <div class="hint" style="margin:0 0 6px;">TS2 도펀트 원료 투입량</div>
+              ${prominent}
+            </div>
+            ${linesHtml([
+              ['최종 Li/Me ratio', b.extraLi ? `${fmt(b.r, 4)} (보정 후)` : fmt(liFinal, 4)],
+              ['도펀트 총량 (M-site 기준)', `${fmt(dopMolPct, 3)} mol%`],
+              ['도펀트 원료 총량', `${fmt(dopRawTotal, 4)} g`],
+              ['TS2 총 혼합 질량', `${fmt(totalMix2, 2)} g`]
+            ])}
+            ${warn ? `<div class="warn-inline">${warn}</div>` : ''}
+            <p class="hint">TS1 가소성품은 명목상 LiᵣMO₂로 가정해 NCM 금속 몰수를 역산합니다.${basis === 'ppm' ? ' ppm은 가소성품 질량 대비 원소 질량 기준입니다.' : ''}</p>
+          `;
+
+          const ts2Lines = [
+            `TS2 (${basis === 'sub' ? 'mol% 치환' : basis === 'ext' ? 'mol% 외첨' : 'ppm wt'}) | 가소성품 ${m2} g`,
+            ...weights.map(x => `${x.el} ${x.raw} (${fmt(x.pct, pctDec)} ${unit}): ${fmt(x.g, 4)} g`)
+          ];
+          if (b.extraLi && extraLiMass > 0) ts2Lines.push(`추가 ${b.liSrcName}: ${fmt(extraLiMass, 4)} g`);
+          ts2Lines.push(`최종 Li/Me: ${b.extraLi ? fmt(b.r, 4) : fmt(liFinal, 4)} / 총 혼합: ${fmt(totalMix2, 2)} g`);
+          copyBlocks.push(ts2Lines.join('\n'));
+        }
+      }
+
+      if (copyBlocks.length) {
+        copies.ts = `${today}\n${copyBlocks.join('\n\n')}`;
+        $('ts-actions').innerHTML = `
+          <div class="action-row">
+            <button type="button" class="btn" data-copy="ts">계산 결과 복사</button>
+            <button type="button" class="btn secondary" data-save="ts">기록 저장</button>
+          </div>
+        `;
+      } else {
+        copies.ts = '';
+        $('ts-actions').innerHTML = '';
+      }
+    }
+
+    function calcOs() {
+      const rawMass = $('os-mass').value.trim();
+      if (rawMass === '') {
+        $('os-output').innerHTML = '<div class="empty-state">전구체 질량(g)을 입력하면 투입량이 자동으로 계산됩니다.</div>';
+        copies.os = '';
+        return;
+      }
+      const b = getCommonParams('os');
+      const m = Number(rawMass);
+      if (!b || !Number.isFinite(m) || m <= 0) {
+        $('os-output').innerHTML = '<div class="error">전이금속 조성(합계 100, 음수 불가), 질량, Li/Me 및 순도 값을 확인해 주세요.</div>';
+        copies.os = '';
+        return;
+      }
+      const dop = getDops('os');
+      if (!dop) {
+        $('os-output').innerHTML = '<div class="error">도펀트 입력값을 확인해 주세요. (음수 불가, 치환 총량 100 mol% 미만)</div>';
+        copies.os = '';
+        return;
+      }
+
+      const ratio = ['Ni', 'Co', 'Mn'].map(x => $('os-' + x).value).join(':');
+      const today = new Date().toLocaleDateString('ko-KR');
       const { rows, incompleteCount, basis } = dop;
       const warn = incompleteCount > 0 ? `미입력 도펀트 행 ${incompleteCount}개가 있어 완료된 항목만 계산했습니다.` : '';
       const unit = basisUnitLabel(basis);
       const pctDec = basis === 'ppm' ? 0 : 3;
 
-      if (k === 'ts2') {
-        const ts1Unit = b.mm + b.r * aw.Li + 2 * aw.O;
-        const nBase = b.m / ts1Unit;
-        const nLiTs1 = nBase * b.r;
-        let nTotal = nBase;
-        let weights = [];
 
-        if (basis === 'sub') {
-          const d = dop.d;
-          nTotal = nBase / (1 - d);
-          weights = rows.map(x => {
-            const nDop = nTotal * (x.pct / 100);
-            const g = (nDop / x.atoms) * x.mw / (b.dopPurity / 100);
-            return { ...x, nDop, g };
-          });
-        } else if (basis === 'ext') {
-          weights = rows.map(x => {
-            const nDop = nBase * (x.pct / 100);
-            const g = (nDop / x.atoms) * x.mw / (b.dopPurity / 100);
-            return { ...x, nDop, g };
-          });
-          nTotal = nBase + weights.reduce((s, x) => s + x.nDop, 0);
-        } else {
-          weights = rows.map(x => {
-            const mEl = b.m * (x.pct / 1e6);
-            const nDop = mEl / aw[x.el];
-            const g = (nDop / x.atoms) * x.mw / (b.dopPurity / 100);
-            return { ...x, nDop, g };
-          });
-          nTotal = nBase + weights.reduce((s, x) => s + x.nDop, 0);
-        }
-
-        const totalDopMol = weights.reduce((s, x) => s + x.nDop, 0);
-        const dopMolPct = nTotal > 0 ? (totalDopMol / nTotal) * 100 : 0;
-        const dopRawTotal = weights.reduce((s, x) => s + x.g, 0);
-        const liFinal = nLiTs1 / nTotal;
-        const nLiExtra = Math.max(0, b.r * nTotal - nLiTs1);
-        const extraLiMass = b.extraLi ? calcLiRawMass(nLiExtra, b) : 0;
-        const totalMix = b.m + dopRawTotal + extraLiMass;
-
-        const prominent = (b.extraLi && extraLiMass > 0
-          ? `<div class="highlight-dose"><span>추가 ${b.liSrcName} <small>(Li/Me ${b.r} 유지)</small></span><strong>${fmt(extraLiMass, 4)} g</strong></div>`
-          : '') + highlightDopants(weights, basis);
-
-        const items = [
-          ['최종 Li/Me ratio', b.extraLi ? `${fmt(b.r, 4)} (보정 후)` : fmt(liFinal, 4)],
-          ['도펀트 총량 (M-site 기준)', `${fmt(dopMolPct, 3)} mol%`],
-          ['도펀트 원료 총량', `${fmt(dopRawTotal, 4)} g`],
-          ['총 혼합 질량', `${fmt(totalMix, 2)} g`]
-        ];
-
-        const copyLines = [
-          `${today}`,
-          `TS2 (${basis === 'sub' ? 'mol% 치환' : basis === 'ext' ? 'mol% 외첨' : 'ppm wt'}) | NCM ${ratio} / TS1 Li/Me ${b.r} / 가소성품 ${b.m} g`,
-          ...weights.map(x => `${x.el} ${x.raw} (${fmt(x.pct, pctDec)} ${unit}): ${fmt(x.g, 4)} g`)
-        ];
-        if (b.extraLi && extraLiMass > 0) copyLines.push(`추가 ${b.liSrcName}: ${fmt(extraLiMass, 4)} g`);
-        copyLines.push(`총 혼합 질량: ${fmt(totalMix, 2)} g`);
-        copyLines.push(`최종 Li/Me: ${b.extraLi ? fmt(b.r, 4) : fmt(liFinal, 4)}`);
-
-        return renderOutput(k, {
-          heading: '도펀트 원료 투입량',
-          prominent,
-          items,
-          copy: copyLines.join('\n'),
-          warn,
-          note: `${corrNote}TS1 가소성품은 명목상 LiᵣMO₂로 가정해 NCM 금속 몰수를 역산합니다.${basis === 'ppm' ? ' ppm은 입력한 TS1 가소성품 질량 대비 원소 질량 기준입니다.' : ''}`
-        });
-      }
-
-      /* OS Tab */
-      const nBase = b.m / b.hydroxide;
+      const nBase = m / b.hydroxide;
       let nTotal = nBase;
       let weights = [];
 
       if (basis === 'sub') {
-        const d = dop.d;
-        nTotal = nBase / (1 - d);
+        nTotal = nBase / (1 - dop.d);
         weights = rows.map(x => {
           const nDop = nTotal * (x.pct / 100);
-          const g = (nDop / x.atoms) * x.mw / (b.dopPurity / 100);
+          const g = (nDop / x.atoms) * x.mw;
           return { ...x, nDop, g };
         });
       } else if (basis === 'ext') {
         weights = rows.map(x => {
           const nDop = nBase * (x.pct / 100);
-          const g = (nDop / x.atoms) * x.mw / (b.dopPurity / 100);
+          const g = (nDop / x.atoms) * x.mw;
           return { ...x, nDop, g };
         });
         nTotal = nBase + weights.reduce((s, x) => s + x.nDop, 0);
@@ -1291,7 +1603,7 @@
         weights = rows.map(x => {
           const mEl = baseCalcined * (x.pct / 1e6);
           const nDop = mEl / aw[x.el];
-          const g = (nDop / x.atoms) * x.mw / (b.dopPurity / 100);
+          const g = (nDop / x.atoms) * x.mw;
           return { ...x, nDop, g };
         });
         nTotal = nBase + weights.reduce((s, x) => s + x.nDop, 0);
@@ -1304,33 +1616,312 @@
       const dopMolPct = nTotal > 0 ? (totalDopMol / nTotal) * 100 : 0;
       const metalMass = nBase * b.mm + weights.reduce((s, x) => s + x.nDop * aw[x.el], 0);
       const calcined = metalMass + nLi * aw.Li + 2 * aw.O * nTotal;
-      const totalMix = b.m + liMass + dopRawTotal;
+      const totalMix = m + liMass + dopRawTotal;
 
-      const copyLines = [
+      copies.os = [
         `${today}`,
-        `OS (${basis === 'sub' ? 'mol% 치환' : basis === 'ext' ? 'mol% 외첨' : 'ppm wt'}) | NCM ${ratio} / Li/Me ${b.r} / 전구체 ${b.m} g`,
+        `OS (${basis === 'sub' ? 'mol% 치환' : basis === 'ext' ? 'mol% 외첨' : 'ppm wt'}) | NCM ${ratio} / Li/Me ${b.r} / 전구체 ${m} g`,
         `${b.liSrcName}: ${fmt(liMass, 4)} g`,
         ...weights.map(x => `${x.el} ${x.raw} (${fmt(x.pct, pctDec)} ${unit}): ${fmt(x.g, 4)} g`),
         `총 혼합 질량: ${fmt(totalMix, 2)} g`,
         `예상 소성 후 질량: ${fmt(calcined, 2)} g`
-      ];
+      ].join('\n');
 
-      renderOutput(k, {
-        heading: `${b.liSrcName} 및 도펀트 투입량`,
-        prominent: `<div class="highlight-dose"><span>${b.liSrcName}</span><strong>${fmt(liMass, 4)} g</strong></div>${highlightDopants(weights, basis)}`,
-        items: [
+      $('os-output').innerHTML = `
+        <div class="result">
+          <div class="hint" style="margin:0 0 6px;">${b.liSrcName} 및 도펀트 투입량</div>
+          <div class="highlight-dose"><span>${b.liSrcName}</span><strong>${fmt(liMass, 4)} g</strong></div>
+          ${highlightDopants(weights, basis)}
+        </div>
+        ${linesHtml([
           ['총 도펀트 함량 (M-site 기준)', `${fmt(dopMolPct, 3)} mol%`],
           ['도펀트 원료 총량', `${fmt(dopRawTotal, 4)} g`],
           ['총 혼합 질량', `${fmt(totalMix, 2)} g`],
           ['예상 소성 후 질량', `${fmt(calcined, 2)} g`]
-        ],
-        copy: copyLines.join('\n'),
-        warn,
-        note: `${corrNote}소성 후 질량은 명목상 LiᵣM총O₂ 이론값입니다.${basis === 'ppm' ? ' ppm은 도핑 전 예상 소성 후 NCM 질량 대비 원소 질량 기준입니다.' : ''}`
-      });
+        ])}
+        ${warn ? `<div class="warn-inline">${warn}</div>` : ''}
+        <p class="hint">소성 후 질량은 명목상 LiᵣM총O₂ 이론값입니다.${basis === 'ppm' ? ' ppm은 도핑 전 예상 소성 후 NCM 질량 대비 원소 질량 기준입니다.' : ''}</p>
+        <div class="action-row">
+          <button type="button" class="btn" data-copy="os">계산 결과 복사</button>
+          <button type="button" class="btn secondary" data-save="os">기록 저장</button>
+        </div>
+      `;
     }
 
-    /* Enhanced Wheel Picker (scroll + tap + keyboard) */
+    /* ================= Coating Tab ================= */
+    function getPhasesForEl(el) {
+      if (!el) return [];
+      return COAT_PHASES[el] || [{ label: `Li${el}O₂`, x: 1, y: 1, z: 2 }];
+    }
+
+    function formatCustomPhase(el, x, y, z) {
+      const sub = (n) => {
+        const s = String(n);
+        if (s === '1') return '';
+        const map = { '0':'₀','1':'₁','2':'₂','3':'₃','4':'₄','5':'₅','6':'₆','7':'₇','8':'₈','9':'₉','.':'.' };
+        return s.split('').map(c => map[c] ?? c).join('');
+      };
+      const liPart = Number(x) > 0 ? `Li${sub(x)}` : '';
+      const mPart = `${el}${sub(y)}`;
+      const oPart = Number(z) > 0 ? `O${sub(z)}` : '';
+      return `${liPart}${mPart}${oPart}`;
+    }
+
+    function renderCoatRows() {
+      const unitLabel = state.coatMode === 'ppm' ? '원소 ppm' : '상 wt%';
+      const placeholder = state.coatMode === 'ppm' ? 'ppm' : 'wt%';
+      $('coat-rows').innerHTML = curCoat().rows.map((c, i) => {
+        const raws = c.el ? (COAT_CHEMICALS[c.el] || []) : [];
+        const phases = getPhasesForEl(c.el);
+        const isCustom = c.phaseIdx === 'custom';
+        return `
+          <div class="coat-row">
+            <div class="coat-top">
+              <div>
+                <label>원소</label>
+                <select data-coat-i="${i}" data-coat-field="el">
+                  <option value="" ${!c.el ? 'selected' : ''} disabled>선택</option>
+                  ${coatElementOrder.map(el => `<option value="${el}" ${el === c.el ? 'selected' : ''}>${el}</option>`).join('')}
+                </select>
+              </div>
+              <div>
+                <label>코팅 원료</label>
+                <select data-coat-i="${i}" data-coat-field="raw" ${!c.el ? 'disabled' : ''}>
+                  <option value="" ${!c.raw ? 'selected' : ''} disabled>원료 선택</option>
+                  ${raws.map(([name]) => `<option value="${name}" ${name === c.raw ? 'selected' : ''}>${name}</option>`).join('')}
+                </select>
+              </div>
+              <div>
+                <label>${unitLabel}</label>
+                <input data-coat-i="${i}" data-coat-field="val" type="number" min="0" step="any" inputmode="decimal" placeholder="${placeholder}" value="${escapeHtml(c.val)}">
+              </div>
+              <button type="button" class="remove" data-coat-remove="${i}" aria-label="삭제">×</button>
+            </div>
+            ${c.el ? `
+              <div class="coat-phase-row">
+                <div>
+                  <label>형성 코팅상 (Li<sub>x</sub>${escapeHtml(c.el)}<sub>y</sub>O<sub>z</sub>)</label>
+                  <select data-coat-i="${i}" data-coat-field="phaseIdx">
+                    ${phases.map((p, idx) => `<option value="${idx}" ${String(idx) === String(c.phaseIdx) ? 'selected' : ''}>${escapeHtml(p.label)} (MW ${fmt(p.x * aw.Li + p.y * aw[c.el] + p.z * aw.O, 2)})</option>`).join('')}
+                    <option value="custom" ${isCustom ? 'selected' : ''}>직접 입력 (x, y, z 조성)</option>
+                  </select>
+                </div>
+                ${isCustom ? `
+                  <div class="coat-xyz">
+                    <div><label>Li (x)</label><input type="number" min="0" step="any" inputmode="decimal" data-coat-i="${i}" data-coat-field="x" value="${escapeHtml(c.x)}"></div>
+                    <div><label>${escapeHtml(c.el)} (y)</label><input type="number" min="0.01" step="any" inputmode="decimal" data-coat-i="${i}" data-coat-field="y" value="${escapeHtml(c.y)}"></div>
+                    <div><label>O (z)</label><input type="number" min="0" step="any" inputmode="decimal" data-coat-i="${i}" data-coat-field="z" value="${escapeHtml(c.z)}"></div>
+                  </div>
+                ` : ''}
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('') || '<p class="hint">코팅 원료가 없습니다. 아래 버튼으로 추가하세요.</p>';
+    }
+
+    function calcCoat() {
+      const rawMass = $('coat-mass').value.trim();
+      if (rawMass === '') {
+        $('coat-output').innerHTML = '<div class="empty-state">양극재 질량(g)과 코팅 원료 함량을 입력하면 투입량이 자동으로 계산됩니다.</div>';
+        copies.coat = '';
+        return;
+      }
+
+      const mc = Number(rawMass);
+      const liSrcName = $('coat-li-src').value;
+      const liSource = LI_SOURCES[liSrcName];
+
+      if (!Number.isFinite(mc) || mc <= 0 || !liSource) {
+        $('coat-output').innerHTML = '<div class="error">양극재 질량을 0보다 큰 숫자로 입력해 주세요.</div>';
+        copies.coat = '';
+        return;
+      }
+
+      let incomplete = 0;
+      const valid = [];
+
+      for (const c of curCoat().rows) {
+        if (!c.el || !c.raw || String(c.val).trim() === '') {
+          incomplete++;
+          continue;
+        }
+        const val = Number(c.val);
+        const formula = COAT_CHEMICALS[c.el]?.find(([n]) => n === c.raw)?.[1];
+        if (!Number.isFinite(val) || val < 0 || !formula) {
+          $('coat-output').innerHTML = '<div class="error">코팅 원료 함량은 0 이상의 숫자로 입력해 주세요.</div>';
+          copies.coat = '';
+          return;
+        }
+
+        const phases = getPhasesForEl(c.el);
+        let x, y, z, phaseLabel;
+        if (c.phaseIdx === 'custom') {
+          x = Number(c.x); y = Number(c.y); z = Number(c.z);
+          if (!finite(x, y, z) || x < 0 || y <= 0 || z < 0) {
+            $('coat-output').innerHTML = '<div class="error">직접 입력한 코팅상(Li<sub>x</sub>M<sub>y</sub>O<sub>z</sub>)의 x, y, z 값을 확인해 주세요. (y > 0)</div>';
+            copies.coat = '';
+            return;
+          }
+          phaseLabel = formatCustomPhase(c.el, x, y, z);
+        } else {
+          const p = phases[Number(c.phaseIdx)] || phases[0];
+          x = p.x; y = p.y; z = p.z;
+          phaseLabel = p.label.replace(' (비리튬)', '');
+        }
+
+        const phaseMW = x * aw.Li + y * aw[c.el] + z * aw.O;
+        const rawMW = MW(formula);
+        const rawAtoms = formula[c.el] || 0;
+        const rawLiAtoms = formula.Li || 0;
+        if (rawAtoms <= 0 || phaseMW <= 0) {
+          $('coat-output').innerHTML = '<div class="error">선택한 원료 또는 코팅상 화학식을 확인해 주세요.</div>';
+          copies.coat = '';
+          return;
+        }
+
+        valid.push({ ...c, val, x, y, z, phaseLabel, phaseMW, rawMW, rawAtoms, rawLiAtoms });
+      }
+
+      if (!valid.length) {
+        $('coat-output').innerHTML = '<div class="empty-state">코팅 원소·원료와 목표 함량을 입력해 주세요.</div>';
+        copies.coat = '';
+        return;
+      }
+
+      const mode = state.coatMode;
+      const denom = curCoat().denom;
+      let items = [];
+
+      if (mode === 'ppm') {
+        items = valid.map(item => {
+          const mEl = mc * (item.val / 1e6);
+          const nM = mEl / aw[item.el];
+          const gRaw = (nM / item.rawAtoms) * item.rawMW;
+          const nPhase = nM / item.y;
+          const mPhase = nPhase * item.phaseMW;
+          const nLiNeed = Math.max(0, nPhase * item.x - (nM / item.rawAtoms) * item.rawLiAtoms);
+          return { ...item, ppm: item.val, nM, gRaw, mPhase, nLiNeed };
+        });
+        const totalPhaseMass = items.reduce((s, r) => s + r.mPhase, 0);
+        const denomMass = denom === 'total' ? (mc + totalPhaseMass) : mc;
+        items = items.map(r => ({ ...r, wtPct: (r.mPhase / denomMass) * 100 }));
+      } else {
+        const totalWtFrac = valid.reduce((s, r) => s + r.val / 100, 0);
+        if (denom === 'total' && totalWtFrac >= 1) {
+          $('coat-output').innerHTML = '<div class="error">최종 총질량 기준에서 코팅상 wt% 총합은 100% 미만이어야 합니다.</div>';
+          copies.coat = '';
+          return;
+        }
+        const denomMass = denom === 'total' ? mc / (1 - totalWtFrac) : mc;
+        items = valid.map(item => {
+          const mPhase = denomMass * (item.val / 100);
+          const nPhase = mPhase / item.phaseMW;
+          const nM = nPhase * item.y;
+          const gRaw = (nM / item.rawAtoms) * item.rawMW;
+          const ppm = (nM * aw[item.el] / mc) * 1e6;
+          const nLiNeed = Math.max(0, nPhase * item.x - (nM / item.rawAtoms) * item.rawLiAtoms);
+          return { ...item, wtPct: item.val, ppm, nM, gRaw, mPhase, nLiNeed };
+        });
+      }
+
+      const totalRawMass = items.reduce((s, r) => s + r.gRaw, 0);
+      const totalPhaseMass = items.reduce((s, r) => s + r.mPhase, 0);
+      const totalPhaseWtPct = denom === 'total'
+        ? (totalPhaseMass / (mc + totalPhaseMass)) * 100
+        : (totalPhaseMass / mc) * 100;
+
+      const totalLiMol = items.reduce((s, r) => s + r.nLiNeed, 0);
+      const liConsumePpm = (totalLiMol * aw.Li / mc) * 1e6;
+      const liohConsumePpm = (totalLiMol * MW({ Li: 1, O: 1, H: 1 }) / mc) * 1e6;
+      const li2co3ConsumePpm = ((totalLiMol / 2) * MW({ Li: 2, C: 1, O: 3 }) / mc) * 1e6;
+      const liMode = curCoat().liMode;
+
+      const extraLiMass = (liMode === 'add' && totalLiMol > 0)
+        ? (totalLiMol / liSource.liAtoms) * MW(liSource.formula)
+        : 0;
+
+      const totalMix = mc + totalRawMass + extraLiMass;
+      const today = new Date().toLocaleDateString('ko-KR');
+      const modeLabel = mode === 'ppm' ? '원소 ppm 기준' : `코팅상 wt% (${denom === 'ext' ? '외첨' : '총질량'})`;
+
+      const liHighlightHtml = (liMode === 'add' && extraLiMass > 0)
+        ? `
+          <div class="highlight-dose">
+            <span>
+              추가 Li · ${escapeHtml(liSrcName)}
+              <span class="dose-sub">Li<sub>x</sub>M<sub>y</sub>O<sub>z</sub> 화학양론 기준 (Li ${fmt(liConsumePpm, 0)} ppm 상당)</span>
+            </span>
+            <strong>${fmt(extraLiMass, 4)} g</strong>
+          </div>
+        `
+        : '';
+
+      const prominentHtml = items.map(r => `
+        <div class="highlight-dose">
+          <span>
+            ${escapeHtml(r.el)} · ${escapeHtml(r.raw)}
+            <span class="dose-sub">원소 ${fmt(r.ppm, 0)} ppm ↔ ${escapeHtml(r.phaseLabel)} ${fmt(r.wtPct, 3)} wt% (${fmt(r.mPhase, 4)} g)</span>
+          </span>
+          <strong>${fmt(r.gRaw, 4)} g</strong>
+        </div>
+      `).join('') + liHighlightHtml;
+
+      const liBoxHtml = totalLiMol > 0
+        ? `
+          <div class="li-box">
+            <div class="li-box-title">${liMode === 'add' ? '코팅상 형성 Li 화학양론 정보' : '표면 잔류 리튬 소모량 (코팅상 형성 기준)'}</div>
+            <div class="line"><span>필요 Li 원소량</span><strong>${fmt(liConsumePpm, 0)} ppm (${fmt(liConsumePpm / 10000, 3)} wt%)</strong></div>
+            <div class="line"><span>LiOH / Li₂CO₃ 환산</span><strong>${fmt(liohConsumePpm, 0)} / ${fmt(li2co3ConsumePpm, 0)} ppm</strong></div>
+          </div>
+        `
+        : '';
+
+      const copyLines = [
+        `${today}`,
+        `코팅 (${modeLabel} · ${liMode === 'add' ? 'Li 추가 외첨' : '잔류 Li 활용'}) | 양극재 ${mc} g`,
+        ...items.map(r => `${r.el} ${r.raw}: ${fmt(r.gRaw, 4)} g (${fmt(r.ppm, 0)} ppm / ${r.phaseLabel} ${fmt(r.wtPct, 3)} wt%)`)
+      ];
+      if (liMode === 'add' && extraLiMass > 0) {
+        copyLines.push(`추가 ${liSrcName}: ${fmt(extraLiMass, 4)} g (Li ${fmt(liConsumePpm, 0)} ppm 상당)`);
+      }
+      copyLines.push(`코팅 원료 총량: ${fmt(totalRawMass, 4)} g / 예상 코팅상 총량: ${fmt(totalPhaseMass, 4)} g (${fmt(totalPhaseWtPct, 3)} wt%)`);
+      if (liMode === 'residual' && totalLiMol > 0) {
+        copyLines.push(`잔류 Li 소모량: Li ${fmt(liConsumePpm, 0)} ppm (LiOH ${fmt(liohConsumePpm, 0)} / Li₂CO₃ ${fmt(li2co3ConsumePpm, 0)} ppm)`);
+      }
+      copyLines.push(`총 혼합 질량: ${fmt(totalMix, 2)} g`);
+      copies.coat = copyLines.join('\n');
+
+      const warn = incomplete > 0 ? `미입력 코팅 행 ${incomplete}개가 있어 완료된 항목만 계산했습니다.` : '';
+
+      $('coat-output').innerHTML = `
+        <div class="result">
+          <div class="hint" style="margin:0 0 6px;">${liMode === 'add' && extraLiMass > 0 ? '코팅 원료 및 추가 Li 투입량' : '코팅 원료 투입량'}</div>
+          ${prominentHtml}
+        </div>
+        ${liBoxHtml}
+        ${linesHtml([
+          ['코팅 원료 총량 (M 원료)', `${fmt(totalRawMass, 4)} g`],
+          ...(liMode === 'add' && extraLiMass > 0 ? [[`추가 Li 원료 (${liSrcName})`, `${fmt(extraLiMass, 4)} g`]] : []),
+          ['예상 코팅상 총량', `${fmt(totalPhaseMass, 4)} g (${fmt(totalPhaseWtPct, 3)} wt%)`],
+          ['총 혼합 질량', `${fmt(totalMix, 2)} g`]
+        ])}
+        ${warn ? `<div class="warn-inline">${warn}</div>` : ''}
+        <p class="hint">wt% 환산은 ${denom === 'ext' ? '양극재 대비 외첨(코팅상/양극재)' : '최종 총질량(코팅상/(양극재+코팅상))'} 기준입니다.</p>
+        <div class="action-row">
+          <button type="button" class="btn" data-copy="coat">계산 결과 복사</button>
+          <button type="button" class="btn secondary" data-save="coat">기록 저장</button>
+        </div>
+      `;
+    }
+
+    function calc(k) {
+      if (k === 'ts') calcTs();
+      else if (k === 'os') calcOs();
+      else if (k === 'coat') calcCoat();
+    }
+
+    /* Enhanced Wheel Picker */
     function setupWheels() {
       document.querySelectorAll('.wheel').forEach(el => {
         const id = el.dataset.target;
@@ -1444,11 +2035,32 @@
       }
     }
 
-    function escapeHtml(x) {
-      return String(x ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    function syncCoatUiFromState() {
+      const cd = curCoat();
+      $('coat-mass').value = cd.mass;
+      if (LI_SOURCES[cd.liSrc]) $('coat-li-src').value = cd.liSrc;
+      document.querySelectorAll('#coat-mode-bar button').forEach(b => b.classList.toggle('active', b.dataset.coatMode === state.coatMode));
+      document.querySelectorAll('#coat-denom-group button').forEach(b => b.classList.toggle('active', b.dataset.coatDenom === cd.denom));
+      document.querySelectorAll('#coat-li-mode-group button').forEach(b => b.classList.toggle('active', b.dataset.coatLiMode === cd.liMode));
+      $('coat-li-src-wrap').style.display = cd.liMode === 'add' ? 'flex' : 'none';
+      renderCoatRows();
+      calcCoat();
     }
 
     function capture(k) {
+      if (k === 'coat') {
+        const cd = curCoat();
+        return {
+          type: 'coat',
+          mass: $('coat-mass').value,
+          coatMode: state.coatMode,
+          coatDenom: cd.denom,
+          coatLiMode: cd.liMode,
+          liSrc: $('coat-li-src').value,
+          coatRows: cd.rows.map(c => ({ ...c })),
+          result: copies.coat
+        };
+      }
       return {
         type: k,
         ni: $(k + '-Ni').value,
@@ -1456,14 +2068,11 @@
         mn: $(k + '-Mn').value,
         liMe: $(k + '-ratio').value,
         mass: $(k + '-mass').value,
+        ts2Mass: k === 'ts' ? $('ts-ts2-mass').value : '',
         liSrc: $(k + '-li-src').value,
-        liPurity: $(k + '-li-purity').value,
-        liLoss: $(k + '-li-loss').value,
-        dopPurity: $(k + '-dop-purity')?.value || '100',
-        prePurity: $(k + '-pre-purity')?.value || '100',
-        extraLi: k === 'ts2' ? Boolean($(k + '-extra-li')?.checked) : false,
-        dopBasis: k === 'li' ? 'sub' : state.dopBasis[k],
-        dopants: k === 'li' ? [] : state[k].map(d => ({ ...d })),
+        extraLi: k === 'ts' ? Boolean($('ts-extra-li')?.checked) : false,
+        dopBasis: state.dopBasis[k],
+        dopants: state[k].map(d => ({ ...d })),
         result: copies[k]
       };
     }
@@ -1474,7 +2083,13 @@
         return;
       }
       const d = capture(k);
-      const defaultName = `NCM${d.ni}${d.co}${d.mn} · ${k === 'li' ? 'TS1' : k.toUpperCase()}`;
+      let defaultName;
+      if (k === 'coat') {
+        const els = curCoat().rows.filter(c => c.el && c.val !== '').map(c => c.el).join('+');
+        defaultName = `${els || '코팅'} · ${d.mass}g`;
+      } else {
+        defaultName = `NCM${d.ni}${d.co}${d.mn} · ${k.toUpperCase()}`;
+      }
       const name = await openModal({
         title: '실험 기록 저장',
         desc: '기록 목록에 표시될 이름을 입력해 주세요.',
@@ -1501,26 +2116,42 @@
       }
     }
 
+    function formatShortDate(iso) {
+      const d = new Date(iso);
+      if (Number.isNaN(d.getTime())) return '';
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      const hh = String(d.getHours()).padStart(2, '0');
+      const mi = String(d.getMinutes()).padStart(2, '0');
+      return `${mm}.${dd} ${hh}:${mi}`;
+    }
+
     function renderHistory() {
       const records = readHistory();
       $('history-list').innerHTML = records.length
         ? records.map(r => {
-            const unit = basisUnitLabel(r.dopBasis || 'sub');
-            const dopSummary = r.dopants?.filter(d => d.el && d.pct !== '').map(d => `${escapeHtml(d.el)} ${escapeHtml(d.pct)}${unit}`).join(', ');
+            const typeLabel = r.type === 'li' ? 'TS1' : r.type === 'coat' ? '코팅' : String(r.type).toUpperCase();
+            const fallbackPreview = r.type === 'coat'
+              ? `양극재 ${r.mass} g`
+              : `NCM ${r.ni}:${r.co}:${r.mn} · Li/Me ${r.liMe} · ${r.mass} g`;
             return `
-              <article class="history-item">
-                <div class="history-title">${escapeHtml(r.name)}</div>
-                <div class="history-meta">
-                  ${escapeHtml(new Date(r.savedAt).toLocaleString('ko-KR'))} · ${escapeHtml(r.type === 'li' ? 'TS1' : String(r.type).toUpperCase())}<br>
-                  NCM ${escapeHtml(r.ni)}:${escapeHtml(r.co)}:${escapeHtml(r.mn)} · Li/Me ${escapeHtml(r.liMe)} · ${escapeHtml(r.mass)} g${dopSummary ? ' · ' + dopSummary : ''}
+              <details class="history-item">
+                <summary class="history-head">
+                  <span class="history-title">${escapeHtml(r.name)}</span>
+                  <span class="history-head-right">
+                    <span class="history-meta">${escapeHtml(typeLabel)} · ${escapeHtml(formatShortDate(r.savedAt))}</span>
+                    <span class="history-chevron" aria-hidden="true">▾</span>
+                  </span>
+                </summary>
+                <div class="history-body">
+                  <pre class="history-preview">${escapeHtml(r.result || fallbackPreview)}</pre>
+                  <div class="history-actions">
+                    ${r.result ? `<button type="button" data-copy-history="${escapeHtml(r.id)}">결과 복사</button>` : ''}
+                    <button type="button" data-load-id="${escapeHtml(r.id)}">불러오기</button>
+                    <button type="button" class="danger" data-delete-id="${escapeHtml(r.id)}">삭제</button>
+                  </div>
                 </div>
-                ${r.result ? `<pre class="history-preview">${escapeHtml(r.result)}</pre>` : ''}
-                <div class="history-actions">
-                  ${r.result ? `<button type="button" data-copy-history="${escapeHtml(r.id)}">결과 복사</button>` : ''}
-                  <button type="button" data-load-id="${escapeHtml(r.id)}">불러오기</button>
-                  <button type="button" class="danger" data-delete-id="${escapeHtml(r.id)}">삭제</button>
-                </div>
-              </article>
+              </details>
             `;
           }).join('')
         : '<div class="empty-state">저장된 기록이 없습니다. 계산 결과에서 「기록 저장」을 눌러 보관하세요.</div>';
@@ -1532,13 +2163,28 @@
       document.querySelectorAll('nav button').forEach(x => x.classList.toggle('active', x === t));
       document.querySelectorAll('section').forEach(x => x.classList.toggle('active', x.id === k));
       if (k === 'history') renderHistory();
-      else requestAnimationFrame(() => activateWheels(k));
+      else if (k === 'ts' || k === 'os') requestAnimationFrame(() => activateWheels(k));
     }
 
     function loadRecord(id) {
       const r = readHistory().find(x => x.id === id);
-      if (!r || !['li', 'ts2', 'os'].includes(r.type)) return;
-      const k = r.type;
+      if (!r) return;
+
+      if (r.type === 'coat') {
+        state.coatMode = r.coatMode === 'phase' ? 'phase' : 'ppm';
+        const cd = curCoat();
+        cd.mass = String(r.mass ?? '');
+        cd.denom = r.coatDenom || 'ext';
+        cd.liMode = r.coatLiMode || 'add';
+        cd.liSrc = (r.liSrc && LI_SOURCES[r.liSrc]) ? r.liSrc : 'LiOH·H₂O';
+        cd.rows = (r.coatRows && r.coatRows.length) ? r.coatRows.map(c => ({ ...c })) : [emptyCoatRow()];
+        openTab('coat');
+        syncCoatUiFromState();
+        showToast('코팅 기록을 불러왔습니다.');
+        return;
+      }
+
+      const k = r.type === 'os' ? 'os' : 'ts';
       const needsDirect = !Number.isInteger(Number(r.ni)) || !Number.isInteger(Number(r.co)) || Number(r.liMe) < 0.90 || Number(r.liMe) > 1.30;
 
       $(k + '-Ni').value = String(r.ni ?? '83');
@@ -1546,23 +2192,28 @@
       $(k + '-Mn').value = String(r.mn ?? '5');
       $(k + '-Mn-display').textContent = String(r.mn ?? '5');
       $(k + '-ratio').value = String(r.liMe ?? '1.05');
-      $(k + '-mass').value = String(r.mass ?? '');
+
+      if (k === 'ts') {
+        if (r.type === 'ts2') {
+          $('ts-mass').value = '';
+          $('ts-ts2-mass').value = String(r.mass ?? '');
+        } else {
+          $('ts-mass').value = String(r.mass ?? '');
+          $('ts-ts2-mass').value = String(r.ts2Mass ?? '');
+        }
+      } else {
+        $('os-mass').value = String(r.mass ?? '');
+      }
 
       if (r.liSrc && LI_SOURCES[r.liSrc]) $(k + '-li-src').value = r.liSrc;
-      if (r.liPurity) $(k + '-li-purity').value = String(r.liPurity);
-      if (r.liLoss !== undefined) $(k + '-li-loss').value = String(r.liLoss);
-      if ($(k + '-dop-purity') && r.dopPurity) $(k + '-dop-purity').value = String(r.dopPurity);
-      if ($(k + '-pre-purity') && r.prePurity) $(k + '-pre-purity').value = String(r.prePurity);
-      if (k === 'ts2' && $(k + '-extra-li')) $(k + '-extra-li').checked = Boolean(r.extraLi);
+      if (k === 'ts' && $('ts-extra-li')) $('ts-extra-li').checked = Boolean(r.extraLi);
 
-      if (k !== 'li') {
-        state.dopBasis[k] = r.dopBasis || 'sub';
-        document.querySelectorAll(`[data-basis-group="${k}"] button`).forEach(b => {
-          b.classList.toggle('active', b.dataset.basis === state.dopBasis[k]);
-        });
-        state[k] = (r.dopants || []).map(d => ({ el: d.el || '', raw: d.raw || '', pct: String(d.pct ?? '') }));
-        renderDops(k);
-      }
+      state.dopBasis[k] = r.dopBasis || 'sub';
+      document.querySelectorAll(`[data-basis-group="${k}"] button`).forEach(b => {
+        b.classList.toggle('active', b.dataset.basis === state.dopBasis[k]);
+      });
+      state[k] = (r.dopants || []).map(d => ({ el: d.el || '', raw: d.raw || '', pct: String(d.pct ?? '') }));
+      renderDops(k);
 
       if (needsDirect) setInputMode(k, 'direct');
       else syncDirectInputs(k);
@@ -1611,42 +2262,19 @@
     function exportCSV() {
       const records = readHistory();
       if (!records.length) return showToast('내보낼 기록이 없습니다.');
-      const header = ['저장일시', '실험명', '구분', 'Ni', 'Co', 'Mn', 'Li/Me', '질량(g)', 'Li원료', '도펀트', '결과'];
+      const header = ['저장일시', '실험명', '구분', 'Ni', 'Co', 'Mn', 'Li/Me', '질량(g)', 'TS2질량(g)', '결과'];
       const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
       const rows = records.map(r => [
         new Date(r.savedAt).toLocaleString('ko-KR'),
         r.name,
-        r.type === 'li' ? 'TS1' : String(r.type).toUpperCase(),
-        r.ni, r.co, r.mn, r.liMe, r.mass,
-        r.liSrc || 'LiOH·H₂O',
-        (r.dopants || []).map(d => `${d.el}(${d.raw}) ${d.pct}`).join('; '),
+        r.type === 'li' ? 'TS1' : r.type === 'coat' ? '코팅' : String(r.type).toUpperCase(),
+        r.ni ?? '', r.co ?? '', r.mn ?? '', r.liMe ?? '', r.mass ?? '', r.ts2Mass || '',
         (r.result || '').replace(/\n/g, ' | ')
       ].map(esc).join(','));
       const csv = '\uFEFF' + [header.map(esc).join(','), ...rows].join('\n');
       const stamp = new Date().toISOString().slice(0, 10);
       downloadFile(csv, `NCMCalcPro_records_${stamp}.csv`, 'text/csv;charset=utf-8');
       showToast('CSV 파일을 내보냈습니다.');
-    }
-
-    function sendTs1ToTs2() {
-      const data = lastComputed.li;
-      if (!data) return showToast('먼저 TS1 계산을 완료해 주세요.');
-      $('ts2-Ni').value = data.ni;
-      $('ts2-Co').value = data.co;
-      $('ts2-Mn').value = data.mn;
-      $('ts2-Mn-display').textContent = data.mn;
-      $('ts2-ratio').value = data.ratio;
-      $('ts2-mass').value = String(data.calcined);
-      if (LI_SOURCES[data.liSrcName]) $('ts2-li-src').value = data.liSrcName;
-
-      if (state.inputMode.li === 'direct') setInputMode('ts2', 'direct');
-      else syncDirectInputs('ts2');
-
-      updatePresetHighlight('ts2');
-      openTab('ts2');
-      calc('ts2');
-      requestAnimationFrame(() => activateWheels('ts2'));
-      showToast('TS1 조건과 예상 소성 질량을 TS2로 가져왔습니다.');
     }
 
     /* Event Delegation */
@@ -1660,12 +2288,23 @@
         calc(k);
         return;
       }
+      if (t.id === 'coat-mass') {
+        curCoat().mass = t.value;
+        calcCoat();
+        return;
+      }
+      if (t.dataset.coatI !== undefined && t.dataset.coatField) {
+        const c = curCoat().rows[Number(t.dataset.coatI)];
+        c[t.dataset.coatField] = t.value;
+        calcCoat();
+        return;
+      }
       if (t.dataset.k && t.dataset.field) {
         state[t.dataset.k][Number(t.dataset.i)][t.dataset.field] = t.value;
         calc(t.dataset.k);
         return;
       }
-      if (t.id && /^(li|ts2|os)-/.test(t.id)) {
+      if (t.id && /^(ts|os|coat)-/.test(t.id)) {
         calc(t.id.split('-')[0]);
       }
     });
@@ -1695,6 +2334,33 @@
         reader.readAsText(file);
         return;
       }
+      if (t.id === 'coat-li-src') {
+        curCoat().liSrc = t.value;
+        calcCoat();
+        return;
+      }
+      if (t.dataset.coatI !== undefined && t.dataset.coatField) {
+        const idx = Number(t.dataset.coatI);
+        const c = curCoat().rows[idx];
+        const field = t.dataset.coatField;
+        c[field] = t.value;
+        if (field === 'el') {
+          const raws = COAT_CHEMICALS[c.el] || [];
+          c.raw = raws.length ? raws[0][0] : '';
+          const phases = getPhasesForEl(c.el);
+          c.phaseIdx = '0';
+          c.x = phases[0].x; c.y = phases[0].y; c.z = phases[0].z;
+          renderCoatRows();
+        } else if (field === 'phaseIdx') {
+          if (c.phaseIdx !== 'custom') {
+            const p = getPhasesForEl(c.el)[Number(c.phaseIdx)];
+            if (p) { c.x = p.x; c.y = p.y; c.z = p.z; }
+          }
+          renderCoatRows();
+        }
+        calcCoat();
+        return;
+      }
       if (t.dataset.k && t.dataset.field) {
         const k = t.dataset.k;
         const d = state[k][Number(t.dataset.i)];
@@ -1707,7 +2373,7 @@
         calc(k);
         return;
       }
-      if (t.id && /^(li|ts2|os)-/.test(t.id)) {
+      if (t.id && /^(ts|os|coat)-/.test(t.id)) {
         calc(t.id.split('-')[0]);
       }
     });
@@ -1718,6 +2384,48 @@
 
       if (t.dataset.tab) {
         openTab(t.dataset.tab);
+        return;
+      }
+      if (t.dataset.coatMode) {
+        if (state.coatMode !== t.dataset.coatMode) {
+          curCoat().mass = $('coat-mass').value;
+          curCoat().liSrc = $('coat-li-src').value;
+          state.coatMode = t.dataset.coatMode;
+          syncCoatUiFromState();
+        }
+        return;
+      }
+      if (t.dataset.coatDenom) {
+        curCoat().denom = t.dataset.coatDenom;
+        document.querySelectorAll('#coat-denom-group button').forEach(b => b.classList.toggle('active', b === t));
+        calcCoat();
+        return;
+      }
+      if (t.dataset.coatLiMode) {
+        curCoat().liMode = t.dataset.coatLiMode;
+        document.querySelectorAll('#coat-li-mode-group button').forEach(b => b.classList.toggle('active', b === t));
+        $('coat-li-src-wrap').style.display = curCoat().liMode === 'add' ? 'flex' : 'none';
+        calcCoat();
+        return;
+      }
+      if (t.id === 'btn-add-coat') {
+        curCoat().rows.push(emptyCoatRow());
+        renderCoatRows();
+        calcCoat();
+        return;
+      }
+      if (t.dataset.coatRemove !== undefined) {
+        curCoat().rows.splice(Number(t.dataset.coatRemove), 1);
+        renderCoatRows();
+        calcCoat();
+        return;
+      }
+      if (t.id === 'btn-apply-ts1-mass') {
+        if (lastTs1Calcined !== null) {
+          $('ts-ts2-mass').value = String(lastTs1Calcined);
+          calcTs();
+          showToast('TS1 예상 소성 질량을 적용했습니다.');
+        }
         return;
       }
       if (t.dataset.mode) {
@@ -1763,10 +2471,6 @@
         saveRecord(t.dataset.save);
         return;
       }
-      if (t.dataset.sendTs2) {
-        sendTs1ToTs2();
-        return;
-      }
       if (t.dataset.loadId) {
         loadRecord(t.dataset.loadId);
         return;
@@ -1800,11 +2504,12 @@
     });
 
     /* Init */
-    ['ts2', 'os'].forEach(renderDops);
-    ['li', 'ts2', 'os'].forEach(k => {
+    ['ts', 'os'].forEach(k => {
+      renderDops(k);
       updatePresetHighlight(k);
       calc(k);
     });
+    syncCoatUiFromState();
     setupWheels();
     renderHistory();
 
