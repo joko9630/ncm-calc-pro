@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-title" content="NCM Calc Pro">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="apple-touch-icon" href="./icon-192.png">
-  <title>NCM Calc Pro v2.1</title>
+  <title>NCM Calc Pro v2.2</title>
   <style>
     :root {
       --navy: #15283d;
@@ -469,12 +469,48 @@
 
     .coat-mode-bar {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 5px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
       background: #e7eef6;
       padding: 4px;
       border-radius: 10px;
       margin-bottom: 11px;
+    }
+    .formula-banner {
+      background: #f3f7fc;
+      border: 1px solid #d9e5f3;
+      border-radius: 11px;
+      padding: 10px 12px;
+      margin: 11px 0 10px;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .formula-banner .formula-text {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--navy);
+      letter-spacing: -0.2px;
+    }
+    .formula-banner .formula-mw {
+      font-size: 12px;
+      font-weight: 650;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+    .multi-top-grid {
+      display: grid;
+      grid-template-columns: 1.25fr 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .multi-top-grid input {
+      font-size: 15px;
+      font-weight: 700;
+      text-align: center;
+      padding: 9px 6px;
     }
     .coat-mode-bar button {
       border: 0;
@@ -781,7 +817,7 @@
           <small>Cathode Material Calculator · Offline</small>
         </div>
       </div>
-      <span class="version-badge">v2.1</span>
+      <span class="version-badge">v2.2</span>
     </header>
 
     <nav role="tablist">
@@ -846,8 +882,9 @@
         <h2>코팅 소성 계산</h2>
 
         <div class="coat-mode-bar" id="coat-mode-bar">
-          <button type="button" class="active" data-coat-mode="ppm">원소 ppm 기준</button>
-          <button type="button" data-coat-mode="phase">Li<sub>x</sub>M<sub>y</sub>O<sub>z</sub> 상 wt% 기준</button>
+          <button type="button" class="active" data-coat-mode="ppm">원소 ppm</button>
+          <button type="button" data-coat-mode="phase">단일상 wt%</button>
+          <button type="button" data-coat-mode="multi">복합상 wt%</button>
         </div>
 
         <label for="coat-mass">양극재 질량 (g)</label>
@@ -874,11 +911,39 @@
           <select id="coat-li-src"></select>
         </div>
 
-        <div class="dop-header">
-          <h3>코팅 원료 및 형성 상</h3>
+        <div id="coat-single-area">
+          <div class="dop-header">
+            <h3>코팅 원료 및 형성 상</h3>
+          </div>
+          <div id="coat-rows"></div>
+          <button type="button" class="btn secondary" id="btn-add-coat">+ 코팅 원료 추가</button>
         </div>
-        <div id="coat-rows"></div>
-        <button type="button" class="btn secondary" id="btn-add-coat">+ 코팅 원료 추가</button>
+
+        <div id="coat-multi-area" style="display:none;">
+          <div class="formula-banner" id="multi-formula-banner">
+            <span class="formula-text" id="multi-formula-text">복합상 조립 대기</span>
+            <span class="formula-mw" id="multi-formula-mw">원소와 계수를 입력하세요</span>
+          </div>
+          <div class="multi-top-grid">
+            <div>
+              <label for="multi-wt">목표 상 (wt%)</label>
+              <input id="multi-wt" type="number" min="0" step="any" inputmode="decimal" placeholder="예: 1.0">
+            </div>
+            <div>
+              <label for="multi-x">Li 계수 (x)</label>
+              <input id="multi-x" type="number" min="0" step="any" inputmode="decimal" placeholder="0">
+            </div>
+            <div>
+              <label for="multi-z">O 계수 (z)</label>
+              <input id="multi-z" type="number" min="0" step="any" inputmode="decimal" placeholder="0">
+            </div>
+          </div>
+          <div class="dop-header">
+            <h3>구성 원소 및 화학양론 계수</h3>
+          </div>
+          <div id="multi-rows"></div>
+          <button type="button" class="btn secondary" id="btn-add-multi">+ 원소 추가</button>
+        </div>
 
         <div id="coat-output"></div>
       </div>
@@ -1090,12 +1155,23 @@
     const roundClean = (x, dec = 2) => Number(Number(x).toFixed(dec));
 
     const emptyCoatRow = () => ({ el: '', raw: '', val: '', phaseIdx: '0', x: 1, y: 1, z: 2 });
+    const emptyMultiRow = () => ({ el: '', raw: '', stoich: '' });
     const createCoatState = () => ({
       mass: '',
       denom: 'ext',
       liMode: 'add',
       liSrc: 'LiOH·H₂O',
       rows: [emptyCoatRow()]
+    });
+    const createMultiState = () => ({
+      mass: '',
+      denom: 'ext',
+      liMode: 'add',
+      liSrc: 'LiOH·H₂O',
+      targetWt: '',
+      liX: '',
+      oZ: '',
+      elements: [emptyMultiRow(), emptyMultiRow()]
     });
 
     const state = {
@@ -1106,7 +1182,8 @@
       coatMode: 'ppm',
       coatData: {
         ppm: createCoatState(),
-        phase: createCoatState()
+        phase: createCoatState(),
+        multi: createMultiState()
       }
     };
     const curCoat = () => state.coatData[state.coatMode];
@@ -1720,7 +1797,239 @@
       }).join('') || '<p class="hint">코팅 원료가 없습니다. 아래 버튼으로 추가하세요.</p>';
     }
 
+    function subNum(n) {
+      const s = String(n);
+      if (s === '1') return '';
+      return `<sub>${escapeHtml(s)}</sub>`;
+    }
+
+    function subNumPlain(n) {
+      const s = String(n);
+      if (s === '1') return '';
+      const map = { '0':'₀','1':'₁','2':'₂','3':'₃','4':'₄','5':'₅','6':'₆','7':'₇','8':'₈','9':'₉','.':'.' };
+      return s.split('').map(c => map[c] ?? c).join('');
+    }
+
+    function renderMultiRows() {
+      const cd = state.coatData.multi;
+      $('multi-rows').innerHTML = cd.elements.map((row, i) => {
+        const raws = row.el ? (COAT_CHEMICALS[row.el] || []) : [];
+        return `
+          <div class="dop">
+            <div>
+              <label>원소</label>
+              <select data-multi-i="${i}" data-multi-field="el">
+                <option value="" ${!row.el ? 'selected' : ''} disabled>선택</option>
+                ${coatElementOrder.map(el => `<option value="${el}" ${el === row.el ? 'selected' : ''}>${el}</option>`).join('')}
+              </select>
+            </div>
+            <div>
+              <label>코팅 원료</label>
+              <select data-multi-i="${i}" data-multi-field="raw" ${!row.el ? 'disabled' : ''}>
+                <option value="" ${!row.raw ? 'selected' : ''} disabled>원료 선택</option>
+                ${raws.map(([name]) => `<option value="${name}" ${name === row.raw ? 'selected' : ''}>${name}</option>`).join('')}
+              </select>
+            </div>
+            <div>
+              <label>계수</label>
+              <input data-multi-i="${i}" data-multi-field="stoich" type="number" min="0" step="any" inputmode="decimal" placeholder="몰비" value="${escapeHtml(row.stoich)}">
+            </div>
+            <button type="button" class="remove" data-multi-remove="${i}" aria-label="삭제">×</button>
+          </div>
+        `;
+      }).join('') || '<p class="hint">구성 원소가 없습니다. 아래 버튼으로 추가하세요.</p>';
+    }
+
+    function buildMultiFormula(liX, validEls, oZ) {
+      const htmlParts = [];
+      const plainParts = [];
+      if (liX > 0) {
+        htmlParts.push(`Li${subNum(liX)}`);
+        plainParts.push(`Li${subNumPlain(liX)}`);
+      }
+      for (const r of validEls) {
+        htmlParts.push(`${escapeHtml(r.el)}${subNum(r.stoich)}`);
+        plainParts.push(`${r.el}${subNumPlain(r.stoich)}`);
+      }
+      if (oZ > 0) {
+        htmlParts.push(`O${subNum(oZ)}`);
+        plainParts.push(`O${subNumPlain(oZ)}`);
+      }
+      return { html: htmlParts.join(''), plain: plainParts.join('') };
+    }
+
+    function calcCoatMulti() {
+      const cd = state.coatData.multi;
+      const liX = cd.liX === '' ? 0 : Number(cd.liX);
+      const oZ = cd.oZ === '' ? 0 : Number(cd.oZ);
+
+      let incomplete = 0;
+      const validEls = [];
+      let elInvalid = false;
+
+      for (const row of cd.elements) {
+        if (!row.el || !row.raw || String(row.stoich).trim() === '') {
+          incomplete++;
+          continue;
+        }
+        const stoich = Number(row.stoich);
+        const formula = COAT_CHEMICALS[row.el]?.find(([n]) => n === row.raw)?.[1];
+        if (!Number.isFinite(stoich) || stoich <= 0 || !formula) {
+          elInvalid = true;
+          break;
+        }
+        validEls.push({
+          ...row,
+          stoich,
+          formula,
+          rawMW: MW(formula),
+          rawAtoms: formula[row.el] || 0,
+          rawLiAtoms: formula.Li || 0
+        });
+      }
+
+      const validStoich = Number.isFinite(liX) && liX >= 0 && Number.isFinite(oZ) && oZ >= 0 && !elInvalid && validEls.length > 0;
+      const phaseMW = validStoich
+        ? liX * aw.Li + validEls.reduce((s, r) => s + r.stoich * aw[r.el], 0) + oZ * aw.O
+        : 0;
+      const formulaInfo = validStoich ? buildMultiFormula(liX, validEls, oZ) : null;
+
+      if (validStoich && phaseMW > 0) {
+        $('multi-formula-text').innerHTML = formulaInfo.html;
+        $('multi-formula-mw').textContent = `MW ${fmt(phaseMW, 2)} g/mol`;
+      } else {
+        $('multi-formula-text').textContent = '복합상 조립 대기';
+        $('multi-formula-mw').textContent = '원소와 계수를 입력하세요';
+      }
+
+      const rawMass = $('coat-mass').value.trim();
+      const rawWt = String(cd.targetWt).trim();
+
+      if (rawMass === '' || rawWt === '' || (!elInvalid && validEls.length === 0)) {
+        $('coat-output').innerHTML = '<div class="empty-state">양극재 질량(g), 목표 상(wt%), 구성 원소와 계수를 입력하면 투입량이 자동으로 계산됩니다.</div>';
+        copies.coat = '';
+        return;
+      }
+
+      const mc = Number(rawMass);
+      const targetWt = Number(rawWt);
+      const liSrcName = $('coat-li-src').value;
+      const liSource = LI_SOURCES[liSrcName];
+
+      if (!Number.isFinite(mc) || mc <= 0 || !Number.isFinite(targetWt) || targetWt <= 0 || !liSource) {
+        $('coat-output').innerHTML = '<div class="error">양극재 질량과 목표 상(wt%)은 0보다 큰 숫자로 입력해 주세요.</div>';
+        copies.coat = '';
+        return;
+      }
+      if (!validStoich || phaseMW <= 0) {
+        $('coat-output').innerHTML = '<div class="error">Li·O 계수(0 이상)와 구성 원소 계수(0 초과)를 확인해 주세요.</div>';
+        copies.coat = '';
+        return;
+      }
+      if (cd.denom === 'total' && targetWt >= 100) {
+        $('coat-output').innerHTML = '<div class="error">최종 총질량 기준에서 목표 상 wt%는 100% 미만이어야 합니다.</div>';
+        copies.coat = '';
+        return;
+      }
+
+      const denomMass = cd.denom === 'total' ? mc / (1 - targetWt / 100) : mc;
+      const mPhase = denomMass * (targetWt / 100);
+      const nPhase = mPhase / phaseMW;
+
+      const items = validEls.map(r => {
+        const nM = nPhase * r.stoich;
+        const gRaw = (nM / r.rawAtoms) * r.rawMW;
+        const ppm = (nM * aw[r.el] / mc) * 1e6;
+        const liProvided = (nM / r.rawAtoms) * r.rawLiAtoms;
+        return { ...r, nM, gRaw, ppm, liProvided };
+      });
+
+      const totalRawMass = items.reduce((s, r) => s + r.gRaw, 0);
+      const totalLiProvided = items.reduce((s, r) => s + r.liProvided, 0);
+      const totalLiMol = Math.max(0, nPhase * liX - totalLiProvided);
+      const liConsumePpm = (totalLiMol * aw.Li / mc) * 1e6;
+      const liohConsumePpm = (totalLiMol * MW({ Li: 1, O: 1, H: 1 }) / mc) * 1e6;
+      const li2co3ConsumePpm = ((totalLiMol / 2) * MW({ Li: 2, C: 1, O: 3 }) / mc) * 1e6;
+
+      const extraLiMass = (cd.liMode === 'add' && totalLiMol > 0)
+        ? (totalLiMol / liSource.liAtoms) * MW(liSource.formula)
+        : 0;
+      const totalMix = mc + totalRawMass + extraLiMass;
+
+      const liHighlightHtml = (cd.liMode === 'add' && extraLiMass > 0)
+        ? `
+          <div class="highlight-dose">
+            <span>
+              추가 Li · ${escapeHtml(liSrcName)}
+              <span class="dose-sub">${formulaInfo.html} 화학양론 기준 (Li ${fmt(liConsumePpm, 0)} ppm 상당)</span>
+            </span>
+            <strong>${fmt(extraLiMass, 4)} g</strong>
+          </div>
+        `
+        : '';
+
+      const prominentHtml = items.map(r => `
+        <div class="highlight-dose">
+          <span>
+            ${escapeHtml(r.el)} · ${escapeHtml(r.raw)}
+            <span class="dose-sub">계수 ${escapeHtml(r.stoich)} · 원소 ${fmt(r.ppm, 0)} ppm</span>
+          </span>
+          <strong>${fmt(r.gRaw, 4)} g</strong>
+        </div>
+      `).join('') + liHighlightHtml;
+
+      const liBoxHtml = totalLiMol > 0
+        ? `
+          <div class="li-box">
+            <div class="li-box-title">${cd.liMode === 'add' ? '복합상 형성 Li 화학양론 정보' : '표면 잔류 리튬 소모량 (복합상 형성 기준)'}</div>
+            <div class="line"><span>필요 Li 원소량</span><strong>${fmt(liConsumePpm, 0)} ppm (${fmt(liConsumePpm / 10000, 3)} wt%)</strong></div>
+            <div class="line"><span>LiOH / Li₂CO₃ 환산</span><strong>${fmt(liohConsumePpm, 0)} / ${fmt(li2co3ConsumePpm, 0)} ppm</strong></div>
+          </div>
+        `
+        : '';
+
+      const today = new Date().toLocaleDateString('ko-KR');
+      const copyLines = [
+        `${today}`,
+        `복합상 코팅 (${formulaInfo.plain} ${fmt(targetWt, 3)} wt% · ${cd.denom === 'ext' ? '외첨' : '총질량'} · ${cd.liMode === 'add' ? 'Li 추가 외첨' : '잔류 Li 활용'}) | 양극재 ${mc} g`,
+        ...items.map(r => `${r.el} ${r.raw} (계수 ${r.stoich}): ${fmt(r.gRaw, 4)} g (${fmt(r.ppm, 0)} ppm)`)
+      ];
+      if (cd.liMode === 'add' && extraLiMass > 0) {
+        copyLines.push(`추가 ${liSrcName}: ${fmt(extraLiMass, 4)} g (Li ${fmt(liConsumePpm, 0)} ppm 상당)`);
+      }
+      copyLines.push(`예상 복합상(${formulaInfo.plain}): ${fmt(mPhase, 4)} g (MW ${fmt(phaseMW, 2)} g/mol)`);
+      if (cd.liMode === 'residual' && totalLiMol > 0) {
+        copyLines.push(`잔류 Li 소모량: Li ${fmt(liConsumePpm, 0)} ppm (LiOH ${fmt(liohConsumePpm, 0)} / Li₂CO₃ ${fmt(li2co3ConsumePpm, 0)} ppm)`);
+      }
+      copyLines.push(`총 혼합 질량: ${fmt(totalMix, 2)} g`);
+      copies.coat = copyLines.join('\n');
+
+      const warn = incomplete > 0 ? `미입력 원소 행 ${incomplete}개가 있어 완료된 항목만 계산했습니다.` : '';
+
+      $('coat-output').innerHTML = `
+        <div class="result">
+          <div class="hint" style="margin:0 0 6px;">${cd.liMode === 'add' && extraLiMass > 0 ? '복합상 원료 및 추가 Li 투입량' : '복합상 원료 투입량'}</div>
+          ${prominentHtml}
+        </div>
+        ${liBoxHtml}
+        ${linesHtml([
+          ['타겟 복합상 / 분자량', `${formulaInfo.html} (${fmt(phaseMW, 2)} g/mol)`],
+          ['코팅 원료 총량 (M 원료)', `${fmt(totalRawMass, 4)} g`],
+          ...(cd.liMode === 'add' && extraLiMass > 0 ? [[`추가 Li 원료 (${liSrcName})`, `${fmt(extraLiMass, 4)} g`]] : []),
+          ['예상 복합상 질량', `${fmt(mPhase, 4)} g (${fmt(targetWt, 3)} wt%)`],
+          ['총 혼합 질량', `${fmt(totalMix, 2)} g`]
+        ])}
+        ${warn ? `<div class="warn-inline">${warn}</div>` : ''}
+        <p class="hint">wt% 기준은 ${cd.denom === 'ext' ? '양극재 대비 외첨(복합상/양극재)' : '최종 총질량(복합상/(양극재+복합상))'}입니다.</p>
+        <div class="action-row">
+          <button type="button" class="btn" data-copy="coat">계산 결과 복사</button>
+          <button type="button" class="btn secondary" data-save="coat">기록 저장</button>
+        </div>
+      `;
+    }
+
     function calcCoat() {
+      if (state.coatMode === 'multi') return calcCoatMulti();
       const rawMass = $('coat-mass').value.trim();
       if (rawMass === '') {
         $('coat-output').innerHTML = '<div class="empty-state">양극재 질량(g)과 코팅 원료 함량을 입력하면 투입량이 자동으로 계산됩니다.</div>';
@@ -2037,19 +2346,44 @@
 
     function syncCoatUiFromState() {
       const cd = curCoat();
+      const isMulti = state.coatMode === 'multi';
       $('coat-mass').value = cd.mass;
       if (LI_SOURCES[cd.liSrc]) $('coat-li-src').value = cd.liSrc;
       document.querySelectorAll('#coat-mode-bar button').forEach(b => b.classList.toggle('active', b.dataset.coatMode === state.coatMode));
       document.querySelectorAll('#coat-denom-group button').forEach(b => b.classList.toggle('active', b.dataset.coatDenom === cd.denom));
       document.querySelectorAll('#coat-li-mode-group button').forEach(b => b.classList.toggle('active', b.dataset.coatLiMode === cd.liMode));
       $('coat-li-src-wrap').style.display = cd.liMode === 'add' ? 'flex' : 'none';
-      renderCoatRows();
+      $('coat-single-area').style.display = isMulti ? 'none' : 'block';
+      $('coat-multi-area').style.display = isMulti ? 'block' : 'none';
+      if (isMulti) {
+        $('multi-wt').value = cd.targetWt;
+        $('multi-x').value = cd.liX;
+        $('multi-z').value = cd.oZ;
+        renderMultiRows();
+      } else {
+        renderCoatRows();
+      }
       calcCoat();
     }
 
     function capture(k) {
       if (k === 'coat') {
         const cd = curCoat();
+        if (state.coatMode === 'multi') {
+          return {
+            type: 'coat',
+            mass: $('coat-mass').value,
+            coatMode: 'multi',
+            coatDenom: cd.denom,
+            coatLiMode: cd.liMode,
+            liSrc: $('coat-li-src').value,
+            targetWt: cd.targetWt,
+            liX: cd.liX,
+            oZ: cd.oZ,
+            multiEls: cd.elements.map(c => ({ ...c })),
+            result: copies.coat
+          };
+        }
         return {
           type: 'coat',
           mass: $('coat-mass').value,
@@ -2085,8 +2419,13 @@
       const d = capture(k);
       let defaultName;
       if (k === 'coat') {
-        const els = curCoat().rows.filter(c => c.el && c.val !== '').map(c => c.el).join('+');
-        defaultName = `${els || '코팅'} · ${d.mass}g`;
+        if (state.coatMode === 'multi') {
+          const els = curCoat().elements.filter(c => c.el && c.stoich !== '').map(c => c.el).join('-');
+          defaultName = `복합상(${els || '코팅'}) · ${d.mass}g`;
+        } else {
+          const els = curCoat().rows.filter(c => c.el && c.val !== '').map(c => c.el).join('+');
+          defaultName = `${els || '코팅'} · ${d.mass}g`;
+        }
       } else {
         defaultName = `NCM${d.ni}${d.co}${d.mn} · ${k.toUpperCase()}`;
       }
@@ -2171,13 +2510,20 @@
       if (!r) return;
 
       if (r.type === 'coat') {
-        state.coatMode = r.coatMode === 'phase' ? 'phase' : 'ppm';
+        state.coatMode = ['ppm', 'phase', 'multi'].includes(r.coatMode) ? r.coatMode : 'ppm';
         const cd = curCoat();
         cd.mass = String(r.mass ?? '');
         cd.denom = r.coatDenom || 'ext';
         cd.liMode = r.coatLiMode || 'add';
         cd.liSrc = (r.liSrc && LI_SOURCES[r.liSrc]) ? r.liSrc : 'LiOH·H₂O';
-        cd.rows = (r.coatRows && r.coatRows.length) ? r.coatRows.map(c => ({ ...c })) : [emptyCoatRow()];
+        if (state.coatMode === 'multi') {
+          cd.targetWt = String(r.targetWt ?? '');
+          cd.liX = String(r.liX ?? '');
+          cd.oZ = String(r.oZ ?? '');
+          cd.elements = (r.multiEls && r.multiEls.length) ? r.multiEls.map(c => ({ ...c })) : [emptyMultiRow(), emptyMultiRow()];
+        } else {
+          cd.rows = (r.coatRows && r.coatRows.length) ? r.coatRows.map(c => ({ ...c })) : [emptyCoatRow()];
+        }
         openTab('coat');
         syncCoatUiFromState();
         showToast('코팅 기록을 불러왔습니다.');
@@ -2293,6 +2639,14 @@
         calcCoat();
         return;
       }
+      if (t.id === 'multi-wt') { state.coatData.multi.targetWt = t.value; calcCoat(); return; }
+      if (t.id === 'multi-x') { state.coatData.multi.liX = t.value; calcCoat(); return; }
+      if (t.id === 'multi-z') { state.coatData.multi.oZ = t.value; calcCoat(); return; }
+      if (t.dataset.multiI !== undefined && t.dataset.multiField) {
+        state.coatData.multi.elements[Number(t.dataset.multiI)][t.dataset.multiField] = t.value;
+        calcCoat();
+        return;
+      }
       if (t.dataset.coatI !== undefined && t.dataset.coatField) {
         const c = curCoat().rows[Number(t.dataset.coatI)];
         c[t.dataset.coatField] = t.value;
@@ -2336,6 +2690,18 @@
       }
       if (t.id === 'coat-li-src') {
         curCoat().liSrc = t.value;
+        calcCoat();
+        return;
+      }
+      if (t.dataset.multiI !== undefined && t.dataset.multiField) {
+        const idx = Number(t.dataset.multiI);
+        const row = state.coatData.multi.elements[idx];
+        row[t.dataset.multiField] = t.value;
+        if (t.dataset.multiField === 'el') {
+          const raws = COAT_CHEMICALS[row.el] || [];
+          row.raw = raws.length ? raws[0][0] : '';
+          renderMultiRows();
+        }
         calcCoat();
         return;
       }
@@ -2417,6 +2783,18 @@
       if (t.dataset.coatRemove !== undefined) {
         curCoat().rows.splice(Number(t.dataset.coatRemove), 1);
         renderCoatRows();
+        calcCoat();
+        return;
+      }
+      if (t.id === 'btn-add-multi') {
+        state.coatData.multi.elements.push(emptyMultiRow());
+        renderMultiRows();
+        calcCoat();
+        return;
+      }
+      if (t.dataset.multiRemove !== undefined) {
+        state.coatData.multi.elements.splice(Number(t.dataset.multiRemove), 1);
+        renderMultiRows();
         calcCoat();
         return;
       }
