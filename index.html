@@ -665,6 +665,31 @@
       flex-wrap: wrap;
       margin-bottom: 10px;
     }
+    .history-filter-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+      background: #e7eef6;
+      padding: 4px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+    .history-filter-bar button {
+      border: 0;
+      background: transparent;
+      padding: 8px 4px;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #516276;
+      border-radius: 7px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .history-filter-bar button.active {
+      background: #fff;
+      color: var(--navy);
+      box-shadow: 0 1px 3px rgba(21, 40, 61, 0.14);
+    }
     .history-item {
       border: 1px solid var(--border);
       border-radius: 12px;
@@ -1079,6 +1104,12 @@
           <button type="button" class="btn secondary mini" id="btn-import-json">JSON 복원</button>
           <button type="button" class="btn secondary mini" id="btn-export-csv">CSV 내보내기</button>
           <input type="file" id="import-file" accept=".json,application/json" style="display:none">
+        </div>
+        <div class="history-filter-bar" id="history-filter-bar" role="tablist">
+          <button type="button" class="active" data-history-filter="all">전체</button>
+          <button type="button" data-history-filter="ts">TS</button>
+          <button type="button" data-history-filter="os">OS</button>
+          <button type="button" data-history-filter="coat">코팅</button>
         </div>
         <div id="history-select-bar" class="history-select-bar" style="display:none;">
           <button type="button" class="btn secondary mini" id="btn-toggle-select-all">전체 선택</button>
@@ -2591,6 +2622,29 @@
 
     const selectedHistoryIds = new Set();
     let showSummaryTable = false;
+    let historyFilter = 'all';
+
+    function getRecordCategory(r) {
+      if (r.type === 'os') return 'os';
+      if (r.type === 'coat') return 'coat';
+      return 'ts';
+    }
+
+    function getFilteredHistory(records) {
+      if (historyFilter === 'all') return records;
+      return records.filter(r => getRecordCategory(r) === historyFilter);
+    }
+
+    function updateHistoryFilterBar(records) {
+      const counts = { all: records.length, ts: 0, os: 0, coat: 0 };
+      records.forEach(r => { counts[getRecordCategory(r)]++; });
+      const labels = { all: '전체', ts: 'TS', os: 'OS', coat: '코팅' };
+      document.querySelectorAll('#history-filter-bar button').forEach(btn => {
+        const f = btn.dataset.historyFilter;
+        btn.classList.toggle('active', f === historyFilter);
+        btn.textContent = counts[f] ? `${labels[f]} (${counts[f]})` : labels[f];
+      });
+    }
 
     function extractRecordAmounts(r) {
       const liSrcName = (r.liSrc && LI_SOURCES[r.liSrc]) ? r.liSrc : 'LiOH·H₂O';
@@ -2847,31 +2901,36 @@
       `;
     }
 
-    function updateHistorySelectBar(records) {
+    function updateHistorySelectBar(allRecords, visibleRecords) {
       const bar = $('history-select-bar');
-      if (!records.length) {
+      const validIds = new Set(allRecords.map(r => r.id));
+      for (const id of [...selectedHistoryIds]) {
+        if (!validIds.has(id)) selectedHistoryIds.delete(id);
+      }
+      if (!visibleRecords.length) {
         bar.style.display = 'none';
         return;
       }
       bar.style.display = 'flex';
-      const validIds = new Set(records.map(r => r.id));
-      for (const id of [...selectedHistoryIds]) {
-        if (!validIds.has(id)) selectedHistoryIds.delete(id);
-      }
-      const count = selectedHistoryIds.size;
-      const allSelected = count > 0 && count === records.length;
+      const visibleSelectedCount = visibleRecords.filter(r => selectedHistoryIds.has(r.id)).length;
+      const allSelected = visibleSelectedCount > 0 && visibleSelectedCount === visibleRecords.length;
       $('btn-toggle-select-all').textContent = allSelected ? '선택 해제' : '전체 선택';
       const showBtn = $('btn-show-summary-table');
-      showBtn.textContent = `선택 항목 표로 보기 (${count})`;
-      showBtn.disabled = count === 0;
+      showBtn.textContent = `선택 항목 표로 보기 (${visibleSelectedCount})`;
+      showBtn.disabled = visibleSelectedCount === 0;
     }
 
     function renderHistory() {
-      const records = readHistory();
-      updateHistorySelectBar(records);
-      renderSummaryTable(records);
-      $('history-list').innerHTML = records.length
-        ? records.map(r => {
+      const allRecords = readHistory();
+      updateHistoryFilterBar(allRecords);
+      const visibleRecords = getFilteredHistory(allRecords);
+      updateHistorySelectBar(allRecords, visibleRecords);
+      renderSummaryTable(visibleRecords);
+      const emptyMsg = allRecords.length === 0
+        ? '저장된 기록이 없습니다. 계산 결과에서 「기록 저장」을 눌러 보관하세요.'
+        : '해당 구분에 저장된 실험 기록이 없습니다.';
+      $('history-list').innerHTML = visibleRecords.length
+        ? visibleRecords.map(r => {
             const typeLabel = r.type === 'li' ? 'TS1' : r.type === 'coat' ? '코팅' : String(r.type).toUpperCase();
             const fallbackPreview = r.type === 'coat'
               ? `양극재 ${r.mass} g`
@@ -2900,7 +2959,7 @@
               </details>
             `;
           }).join('')
-        : '<div class="empty-state">저장된 기록이 없습니다. 계산 결과에서 「기록 저장」을 눌러 보관하세요.</div>';
+        : `<div class="empty-state">${emptyMsg}</div>`;
     }
 
     function openTab(k) {
@@ -3031,7 +3090,7 @@
     }
 
     function buildTableRowsData() {
-      const { rows, matCols } = buildSummaryTableModel(readHistory());
+      const { rows, matCols } = buildSummaryTableModel(getFilteredHistory(readHistory()));
       if (!rows.length) return null;
       const header = ['실험명', '구분', '전구체/기준(g)', 'Li원료(g)', ...matCols.map(c => `${c.label}(g)`)];
       const dataRows = rows.map(row => [
@@ -3107,9 +3166,10 @@
       if (t.dataset.selectId) {
         if (t.checked) selectedHistoryIds.add(t.dataset.selectId);
         else selectedHistoryIds.delete(t.dataset.selectId);
-        const records = readHistory();
-        updateHistorySelectBar(records);
-        if (showSummaryTable) renderSummaryTable(records);
+        const allRecords = readHistory();
+        const visibleRecords = getFilteredHistory(allRecords);
+        updateHistorySelectBar(allRecords, visibleRecords);
+        if (showSummaryTable) renderSummaryTable(visibleRecords);
         return;
       }
       if (t.id === 'import-file') {
@@ -3330,23 +3390,31 @@
       if (t.id === 'btn-export-json') { exportJSON(); return; }
       if (t.id === 'btn-import-json') { $('import-file').click(); return; }
       if (t.id === 'btn-export-csv') { exportCSV(); return; }
+      if (t.dataset.historyFilter) {
+        historyFilter = t.dataset.historyFilter;
+        renderHistory();
+        return;
+      }
       if (t.id === 'btn-toggle-select-all') {
-        const records = readHistory();
-        if (selectedHistoryIds.size === records.length) selectedHistoryIds.clear();
-        else records.forEach(r => selectedHistoryIds.add(r.id));
+        const visibleRecords = getFilteredHistory(readHistory());
+        const allSelected = visibleRecords.length > 0 && visibleRecords.every(r => selectedHistoryIds.has(r.id));
+        if (allSelected) visibleRecords.forEach(r => selectedHistoryIds.delete(r.id));
+        else visibleRecords.forEach(r => selectedHistoryIds.add(r.id));
         renderHistory();
         return;
       }
       if (t.id === 'btn-show-summary-table') {
-        if (!selectedHistoryIds.size) return showToast('표로 정리할 기록을 먼저 선택해 주세요.');
+        const visibleRecords = getFilteredHistory(readHistory());
+        const selectedVisible = visibleRecords.filter(r => selectedHistoryIds.has(r.id));
+        if (!selectedVisible.length) return showToast('표로 정리할 기록을 먼저 선택해 주세요.');
         showSummaryTable = true;
-        renderSummaryTable(readHistory());
+        renderSummaryTable(visibleRecords);
         $('history-table-wrap').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         return;
       }
       if (t.id === 'btn-close-table') {
         showSummaryTable = false;
-        renderSummaryTable(readHistory());
+        renderSummaryTable(getFilteredHistory(readHistory()));
         return;
       }
       if (t.id === 'btn-copy-table-tsv') { copyTableTSV(); return; }
