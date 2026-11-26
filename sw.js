@@ -1,4 +1,4 @@
-const CACHE = 'ncm-calc-pro-v2.2-20261123';
+const CACHE = 'ncm-calc-pro-v2.3-20261126';
 const ASSETS = [
   './',
   './index.html',

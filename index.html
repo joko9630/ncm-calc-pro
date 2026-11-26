@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-title" content="NCM Calc Pro">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="apple-touch-icon" href="./icon-192.png">
-  <title>NCM Calc Pro v2.2</title>
+  <title>NCM Calc Pro v2.3</title>
   <style>
     :root {
       --navy: #15283d;
@@ -672,6 +672,22 @@
       background: #fcfdff;
       overflow: hidden;
     }
+    .history-select-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      background: #f4f7fb;
+      border: 1px solid #e1e9f3;
+      border-radius: 10px;
+      padding: 8px 10px;
+      margin-bottom: 10px;
+    }
+    .history-select-bar .btn.mini:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
     .history-head {
       display: flex;
       align-items: center;
@@ -681,6 +697,109 @@
       cursor: pointer;
       list-style: none;
       user-select: none;
+    }
+    .history-head-left {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-width: 0;
+      flex: 1;
+    }
+    .history-check {
+      width: 18px;
+      height: 18px;
+      margin: 0;
+      flex-shrink: 0;
+      accent-color: var(--navy);
+      cursor: pointer;
+    }
+    .summary-table-card {
+      background: #f8fbff;
+      border: 1px solid #cfe0f3;
+      border-radius: 13px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+    .summary-table-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+    .summary-table-head strong {
+      font-size: 13.5px;
+      color: var(--navy);
+    }
+    .summary-table-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .summary-table-scroll {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      border: 1px solid #dce6f2;
+      border-radius: 9px;
+      background: #fff;
+    }
+    .summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+    .summary-table th, .summary-table td {
+      padding: 8px 10px;
+      border-bottom: 1px solid #e9eff6;
+      text-align: right;
+    }
+    .summary-table th {
+      background: #edf3fa;
+      color: var(--navy);
+      font-weight: 750;
+      font-size: 11.5px;
+      border-bottom: 1px solid #d5e2f0;
+    }
+    .summary-table th:first-child,
+    .summary-table td:first-child {
+      text-align: left;
+      position: sticky;
+      left: 0;
+      background: inherit;
+      z-index: 1;
+      border-right: 1px solid #e9eff6;
+      max-width: 150px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .summary-table thead th:first-child { background: #edf3fa; z-index: 2; }
+    .summary-table tbody tr { background: #fff; }
+    .summary-table tbody tr:nth-child(even) { background: #fafcff; }
+    .summary-table tfoot tr {
+      background: #eef4fb;
+      font-weight: 800;
+      color: var(--navy);
+    }
+    .summary-table tfoot td { border-bottom: 0; border-top: 1.5px solid #c9d9ec; }
+    .summary-table td small {
+      display: block;
+      font-size: 10.5px;
+      font-weight: 500;
+      color: var(--muted);
+    }
+    .tbl-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      background: #e5eef8;
+      color: var(--navy);
+      padding: 1px 5px;
+      border-radius: 4px;
+      margin-right: 4px;
+      vertical-align: 1px;
     }
     .history-head::-webkit-details-marker { display: none; }
     .history-head-right {
@@ -817,7 +936,7 @@
           <small>Cathode Material Calculator · Offline</small>
         </div>
       </div>
-      <span class="version-badge">v2.2</span>
+      <span class="version-badge">v2.3</span>
     </header>
 
     <nav role="tablist">
@@ -961,6 +1080,11 @@
           <button type="button" class="btn secondary mini" id="btn-export-csv">CSV 내보내기</button>
           <input type="file" id="import-file" accept=".json,application/json" style="display:none">
         </div>
+        <div id="history-select-bar" class="history-select-bar" style="display:none;">
+          <button type="button" class="btn secondary mini" id="btn-toggle-select-all">전체 선택</button>
+          <button type="button" class="btn mini" id="btn-show-summary-table" disabled>선택 항목 표로 보기 (0)</button>
+        </div>
+        <div id="history-table-wrap"></div>
         <div id="history-list"></div>
       </div>
     </section>
@@ -2465,18 +2589,301 @@
       return `${mm}.${dd} ${hh}:${mi}`;
     }
 
+    const selectedHistoryIds = new Set();
+    let showSummaryTable = false;
+
+    function extractRecordAmounts(r) {
+      const liSrcName = (r.liSrc && LI_SOURCES[r.liSrc]) ? r.liSrc : 'LiOH·H₂O';
+      const liSource = LI_SOURCES[liSrcName];
+      const liMW = MW(liSource.formula);
+      const calcLi = (nLi) => (nLi / liSource.liAtoms) * liMW;
+
+      const materials = {};
+      const addMat = (el, raw, g) => {
+        if (!el || !raw || !Number.isFinite(g)) return;
+        const key = `${el}::${raw}`;
+        if (!materials[key]) materials[key] = { key, label: raw, mass: 0 };
+        materials[key].mass += g;
+      };
+
+      const typeLabel = r.type === 'li' ? 'TS1' : r.type === 'coat' ? '코팅' : String(r.type || '').toUpperCase();
+      let baseMass = null;
+      let baseNote = '';
+      let liMass = null;
+      let liNote = liSrcName !== 'LiOH·H₂O' ? liSrcName : '';
+
+      if (r.type === 'coat') {
+        const mc = Number(r.mass);
+        if (Number.isFinite(mc) && mc > 0) {
+          baseMass = mc;
+          baseNote = '양극재';
+          const mode = r.coatMode || 'ppm';
+          const denom = r.coatDenom || 'ext';
+          const liMode = r.coatLiMode || 'add';
+          let totalLiMol = 0;
+
+          if (mode === 'multi') {
+            const liX = r.liX === '' || r.liX === undefined ? 0 : Number(r.liX);
+            const oZ = r.oZ === '' || r.oZ === undefined ? 0 : Number(r.oZ);
+            const targetWt = Number(r.targetWt);
+            const els = (r.multiEls || []).filter(row => row.el && row.raw && String(row.stoich).trim() !== '');
+            if (Number.isFinite(targetWt) && targetWt > 0 && els.length) {
+              const phaseMW = liX * aw.Li + els.reduce((s, row) => s + Number(row.stoich) * (aw[row.el] || 0), 0) + oZ * aw.O;
+              if (phaseMW > 0 && !(denom === 'total' && targetWt >= 100)) {
+                const denomMass = denom === 'total' ? mc / (1 - targetWt / 100) : mc;
+                const nPhase = (denomMass * (targetWt / 100)) / phaseMW;
+                let liProvided = 0;
+                for (const row of els) {
+                  const formula = COAT_CHEMICALS[row.el]?.find(([n]) => n === row.raw)?.[1];
+                  if (!formula) continue;
+                  const nM = nPhase * Number(row.stoich);
+                  const atoms = formula[row.el] || 1;
+                  addMat(row.el, row.raw, (nM / atoms) * MW(formula));
+                  liProvided += (nM / atoms) * (formula.Li || 0);
+                }
+                totalLiMol = Math.max(0, nPhase * liX - liProvided);
+              }
+            }
+          } else {
+            const rows = (r.coatRows || []).filter(c => c.el && c.raw && String(c.val).trim() !== '');
+            const totalWtFrac = mode === 'phase' ? rows.reduce((s, c) => s + Number(c.val) / 100, 0) : 0;
+            const denomMass = (mode === 'phase' && denom === 'total' && totalWtFrac < 1) ? mc / (1 - totalWtFrac) : mc;
+            for (const c of rows) {
+              const val = Number(c.val);
+              const formula = COAT_CHEMICALS[c.el]?.find(([n]) => n === c.raw)?.[1];
+              if (!Number.isFinite(val) || !formula) continue;
+              const atoms = formula[c.el] || 1;
+              const rawMW = MW(formula);
+              const phases = getPhasesForEl(c.el);
+              let x, y, z;
+              if (c.phaseIdx === 'custom') { x = Number(c.x); y = Number(c.y); z = Number(c.z); }
+              else { const p = phases[Number(c.phaseIdx)] || phases[0]; x = p.x; y = p.y; z = p.z; }
+              const phaseMW = x * aw.Li + y * aw[c.el] + z * aw.O;
+              let nM = 0, nPhase = 0;
+              if (mode === 'ppm') {
+                nM = (mc * (val / 1e6)) / aw[c.el];
+                nPhase = y > 0 ? nM / y : 0;
+              } else if (phaseMW > 0) {
+                nPhase = (denomMass * (val / 100)) / phaseMW;
+                nM = nPhase * y;
+              }
+              addMat(c.el, c.raw, (nM / atoms) * rawMW);
+              totalLiMol += Math.max(0, nPhase * x - (nM / atoms) * (formula.Li || 0));
+            }
+          }
+          if (liMode === 'add' && totalLiMol > 0) liMass = calcLi(totalLiMol);
+        }
+        return { id: r.id, name: r.name, typeLabel, baseMass, baseNote, liMass, liNote, materials };
+      }
+
+      /* TS / TS1 / TS2 / OS */
+      const ni = Number(r.ni), co = Number(r.co), mn = Number(r.mn), ratio = Number(r.liMe);
+      const sumM = ni + co + mn;
+      if (!finite(ni, co, mn, ratio) || sumM <= 0 || ratio <= 0) {
+        return { id: r.id, name: r.name, typeLabel, baseMass, baseNote, liMass, liNote, materials };
+      }
+      const mm = (ni * aw.Ni + co * aw.Co + mn * aw.Mn) / sumM;
+      const hydroxide = mm + MW({ O: 2, H: 2 });
+      const basis = r.dopBasis || 'sub';
+      const validDops = (r.dopants || []).filter(d => d.el && d.raw && String(d.pct).trim() !== '').map(d => {
+        const formula = chemicals[d.el]?.find(([n]) => n === d.raw)?.[1];
+        return formula ? { ...d, pct: Number(d.pct), atoms: formula[d.el] || 1, mw: MW(formula) } : null;
+      }).filter(Boolean);
+
+      const m1 = Number(r.mass);
+      const m2 = r.type === 'ts2' ? Number(r.mass) : Number(r.ts2Mass);
+
+      if (r.type === 'os') {
+        if (Number.isFinite(m1) && m1 > 0) {
+          baseMass = m1;
+          baseNote = '전구체';
+          const nBase = m1 / hydroxide;
+          let nTotal = nBase;
+          if (basis === 'sub') {
+            const dSum = validDops.reduce((s, d) => s + d.pct / 100, 0);
+            if (dSum < 1) {
+              nTotal = nBase / (1 - dSum);
+              validDops.forEach(d => addMat(d.el, d.raw, (nTotal * (d.pct / 100) / d.atoms) * d.mw));
+            }
+          } else if (basis === 'ext') {
+            let dopMol = 0;
+            validDops.forEach(d => {
+              const nD = nBase * (d.pct / 100);
+              dopMol += nD;
+              addMat(d.el, d.raw, (nD / d.atoms) * d.mw);
+            });
+            nTotal = nBase + dopMol;
+          } else {
+            const baseCalc = nBase * (mm + ratio * aw.Li + 2 * aw.O);
+            let dopMol = 0;
+            validDops.forEach(d => {
+              const nD = (baseCalc * (d.pct / 1e6)) / aw[d.el];
+              dopMol += nD;
+              addMat(d.el, d.raw, (nD / d.atoms) * d.mw);
+            });
+            nTotal = nBase + dopMol;
+          }
+          liMass = calcLi(nTotal * ratio);
+        }
+      } else {
+        /* TS / TS1 / TS2 */
+        let liTotal = 0;
+        let hasLi = false;
+        if (r.type !== 'ts2' && Number.isFinite(m1) && m1 > 0) {
+          baseMass = m1;
+          baseNote = '전구체';
+          liTotal += calcLi((m1 / hydroxide) * ratio);
+          hasLi = true;
+        }
+        if (Number.isFinite(m2) && m2 > 0) {
+          if (baseMass === null) {
+            baseMass = m2;
+            baseNote = '가소성품';
+          } else {
+            baseNote = `TS2 ${fmt(m2, 2)}g`;
+          }
+          const ts1Unit = mm + ratio * aw.Li + 2 * aw.O;
+          const nBase = m2 / ts1Unit;
+          let nTotal = nBase;
+          if (basis === 'sub') {
+            const dSum = validDops.reduce((s, d) => s + d.pct / 100, 0);
+            if (dSum < 1) {
+              nTotal = nBase / (1 - dSum);
+              validDops.forEach(d => addMat(d.el, d.raw, (nTotal * (d.pct / 100) / d.atoms) * d.mw));
+            }
+          } else if (basis === 'ext') {
+            let dopMol = 0;
+            validDops.forEach(d => {
+              const nD = nBase * (d.pct / 100);
+              dopMol += nD;
+              addMat(d.el, d.raw, (nD / d.atoms) * d.mw);
+            });
+            nTotal = nBase + dopMol;
+          } else {
+            let dopMol = 0;
+            validDops.forEach(d => {
+              const nD = (m2 * (d.pct / 1e6)) / aw[d.el];
+              dopMol += nD;
+              addMat(d.el, d.raw, (nD / d.atoms) * d.mw);
+            });
+            nTotal = nBase + dopMol;
+          }
+          if (r.extraLi) {
+            const nExtra = Math.max(0, ratio * nTotal - nBase * ratio);
+            if (nExtra > 0) {
+              liTotal += calcLi(nExtra);
+              hasLi = true;
+            }
+          }
+        }
+        if (hasLi) liMass = liTotal;
+      }
+
+      return { id: r.id, name: r.name, typeLabel, baseMass, baseNote, liMass, liNote, materials };
+    }
+
+    function buildSummaryTableModel(records) {
+      const selected = records.filter(r => selectedHistoryIds.has(r.id));
+      const rows = selected.map(extractRecordAmounts);
+      const matCols = [];
+      const matKeySet = new Set();
+      for (const row of rows) {
+        for (const m of Object.values(row.materials)) {
+          if (!matKeySet.has(m.key)) {
+            matKeySet.add(m.key);
+            matCols.push({ key: m.key, label: m.label });
+          }
+        }
+      }
+      return { rows, matCols };
+    }
+
+    function renderSummaryTable(records) {
+      const wrap = $('history-table-wrap');
+      if (!showSummaryTable) {
+        wrap.innerHTML = '';
+        return;
+      }
+      const { rows, matCols } = buildSummaryTableModel(records);
+      if (!rows.length) {
+        showSummaryTable = false;
+        wrap.innerHTML = '';
+        return;
+      }
+
+      wrap.innerHTML = `
+        <div class="summary-table-card">
+          <div class="summary-table-head">
+            <strong>선택 실험 투입량 정리표 (${rows.length}건)</strong>
+            <div class="summary-table-actions">
+              <button type="button" class="btn secondary mini" id="btn-copy-table-tsv">표 복사 (엑셀)</button>
+              <button type="button" class="btn secondary mini" id="btn-export-table-csv">표 CSV</button>
+              <button type="button" class="btn secondary mini" id="btn-close-table">닫기</button>
+            </div>
+          </div>
+          <div class="summary-table-scroll">
+            <table class="summary-table">
+              <thead>
+                <tr>
+                  <th>실험명</th>
+                  <th>전구체/기준 (g)</th>
+                  <th>Li 원료 (g)</th>
+                  ${matCols.map(c => `<th>${escapeHtml(c.label)} (g)</th>`).join('')}
+                </tr>
+              </thead>
+              <tbody>
+                ${rows.map(row => `
+                  <tr>
+                    <td title="${escapeHtml(row.name)}"><span class="tbl-badge">${escapeHtml(row.typeLabel)}</span>${escapeHtml(row.name)}</td>
+                    <td>${row.baseMass !== null ? fmt(row.baseMass, 2) : '-'}${row.baseNote ? `<small>${escapeHtml(row.baseNote)}</small>` : ''}</td>
+                    <td>${row.liMass !== null ? fmt(row.liMass, 4) : '-'}${row.liNote ? `<small>${escapeHtml(row.liNote)}</small>` : ''}</td>
+                    ${matCols.map(c => `<td>${row.materials[c.key] ? fmt(row.materials[c.key].mass, 4) : '-'}</td>`).join('')}
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function updateHistorySelectBar(records) {
+      const bar = $('history-select-bar');
+      if (!records.length) {
+        bar.style.display = 'none';
+        return;
+      }
+      bar.style.display = 'flex';
+      const validIds = new Set(records.map(r => r.id));
+      for (const id of [...selectedHistoryIds]) {
+        if (!validIds.has(id)) selectedHistoryIds.delete(id);
+      }
+      const count = selectedHistoryIds.size;
+      const allSelected = count > 0 && count === records.length;
+      $('btn-toggle-select-all').textContent = allSelected ? '선택 해제' : '전체 선택';
+      const showBtn = $('btn-show-summary-table');
+      showBtn.textContent = `선택 항목 표로 보기 (${count})`;
+      showBtn.disabled = count === 0;
+    }
+
     function renderHistory() {
       const records = readHistory();
+      updateHistorySelectBar(records);
+      renderSummaryTable(records);
       $('history-list').innerHTML = records.length
         ? records.map(r => {
             const typeLabel = r.type === 'li' ? 'TS1' : r.type === 'coat' ? '코팅' : String(r.type).toUpperCase();
             const fallbackPreview = r.type === 'coat'
               ? `양극재 ${r.mass} g`
               : `NCM ${r.ni}:${r.co}:${r.mn} · Li/Me ${r.liMe} · ${r.mass} g`;
+            const checked = selectedHistoryIds.has(r.id) ? 'checked' : '';
             return `
               <details class="history-item">
                 <summary class="history-head">
-                  <span class="history-title">${escapeHtml(r.name)}</span>
+                  <span class="history-head-left">
+                    <input type="checkbox" class="history-check" data-select-id="${escapeHtml(r.id)}" ${checked} aria-label="${escapeHtml(r.name)} 선택">
+                    <span class="history-title">${escapeHtml(r.name)}</span>
+                  </span>
                   <span class="history-head-right">
                     <span class="history-meta">${escapeHtml(typeLabel)} · ${escapeHtml(formatShortDate(r.savedAt))}</span>
                     <span class="history-chevron" aria-hidden="true">▾</span>
@@ -2623,6 +3030,38 @@
       showToast('CSV 파일을 내보냈습니다.');
     }
 
+    function buildTableRowsData() {
+      const { rows, matCols } = buildSummaryTableModel(readHistory());
+      if (!rows.length) return null;
+      const header = ['실험명', '구분', '전구체/기준(g)', 'Li원료(g)', ...matCols.map(c => `${c.label}(g)`)];
+      const dataRows = rows.map(row => [
+        row.name,
+        row.typeLabel,
+        row.baseMass !== null ? row.baseMass.toFixed(2) : '',
+        row.liMass !== null ? row.liMass.toFixed(4) : '',
+        ...matCols.map(c => row.materials[c.key] ? row.materials[c.key].mass.toFixed(4) : '')
+      ]);
+      return { header, dataRows };
+    }
+
+    async function copyTableTSV() {
+      const tbl = buildTableRowsData();
+      if (!tbl) return showToast('선택된 기록이 없습니다.');
+      const tsv = [tbl.header.join('\t'), ...tbl.dataRows.map(r => r.join('\t'))].join('\n');
+      const ok = await copyToClipboard(tsv);
+      showToast(ok ? '엑셀에 붙여넣을 수 있게 표를 복사했습니다.' : '복사에 실패했습니다.');
+    }
+
+    function exportTableCSV() {
+      const tbl = buildTableRowsData();
+      if (!tbl) return showToast('선택된 기록이 없습니다.');
+      const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+      const csv = '\uFEFF' + [tbl.header.map(esc).join(','), ...tbl.dataRows.map(r => r.map(esc).join(','))].join('\n');
+      const stamp = new Date().toISOString().slice(0, 10);
+      downloadFile(csv, `NCMCalcPro_table_${stamp}.csv`, 'text/csv;charset=utf-8');
+      showToast('선택 항목 표를 CSV로 저장했습니다.');
+    }
+
     /* Event Delegation */
     document.addEventListener('input', (e) => {
       const t = e.target;
@@ -2665,6 +3104,14 @@
 
     document.addEventListener('change', (e) => {
       const t = e.target;
+      if (t.dataset.selectId) {
+        if (t.checked) selectedHistoryIds.add(t.dataset.selectId);
+        else selectedHistoryIds.delete(t.dataset.selectId);
+        const records = readHistory();
+        updateHistorySelectBar(records);
+        if (showSummaryTable) renderSummaryTable(records);
+        return;
+      }
       if (t.id === 'import-file') {
         const file = t.files?.[0];
         if (!file) return;
@@ -2745,6 +3192,10 @@
     });
 
     document.addEventListener('click', async (e) => {
+      if (e.target.classList && e.target.classList.contains('history-check')) {
+        e.stopPropagation();
+        return;
+      }
       const t = e.target.closest('button');
       if (!t) return;
 
@@ -2879,6 +3330,27 @@
       if (t.id === 'btn-export-json') { exportJSON(); return; }
       if (t.id === 'btn-import-json') { $('import-file').click(); return; }
       if (t.id === 'btn-export-csv') { exportCSV(); return; }
+      if (t.id === 'btn-toggle-select-all') {
+        const records = readHistory();
+        if (selectedHistoryIds.size === records.length) selectedHistoryIds.clear();
+        else records.forEach(r => selectedHistoryIds.add(r.id));
+        renderHistory();
+        return;
+      }
+      if (t.id === 'btn-show-summary-table') {
+        if (!selectedHistoryIds.size) return showToast('표로 정리할 기록을 먼저 선택해 주세요.');
+        showSummaryTable = true;
+        renderSummaryTable(readHistory());
+        $('history-table-wrap').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        return;
+      }
+      if (t.id === 'btn-close-table') {
+        showSummaryTable = false;
+        renderSummaryTable(readHistory());
+        return;
+      }
+      if (t.id === 'btn-copy-table-tsv') { copyTableTSV(); return; }
+      if (t.id === 'btn-export-table-csv') { exportTableCSV(); return; }
     });
 
     /* Init */
